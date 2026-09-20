@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCart, useCartSubtotal } from "@/hooks/use-cart";
@@ -10,8 +9,6 @@ import { useMounted } from "@/hooks/use-mounted";
 import { createClient } from "@/lib/supabase/client";
 import { formatSoles } from "@/lib/business";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { BluxLogo } from "@/components/ui/blux-logo";
 
 export function CartView({ deliveryFee }: { deliveryFee: number }) {
   const { items, increment, decrement, removeItem } = useCart();
@@ -69,32 +66,33 @@ export function CartView({ deliveryFee }: { deliveryFee: number }) {
         </div>
       )}
 
-      {items.map((item) => {
-        const isUnavailable = unavailable.includes(item.productId);
-        return (
-          <Card key={item.productId} className={isUnavailable ? "opacity-60" : ""}>
-            <CardContent className="flex items-center gap-3 p-3">
-              <div className="relative size-16 shrink-0 overflow-hidden rounded-md bg-blux-50">
-                {item.imageUrl ? (
-                  <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-500/10 via-red-500/5 to-transparent p-1">
-                    <BluxLogo size="xs" priority={false} />
-                  </div>
-                )}
-              </div>
+      {/* Lista simple: solo nombre, controles y eliminar */}
+      <ul className="flex flex-col divide-y overflow-hidden rounded-lg border">
+        {items.map((item) => {
+          const isUnavailable = unavailable.includes(item.productId);
+          return (
+            <li
+              key={item.productId}
+              className={`flex items-center justify-between gap-3 p-3 ${isUnavailable ? "opacity-60" : ""}`}
+            >
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">{item.name}</p>
-                {isUnavailable && (
-                  <p className="text-xs font-medium text-destructive">No disponible</p>
-                )}
-                <p className="text-sm text-blux-600">{formatSoles(item.price)}</p>
+                <p className="truncate font-medium">
+                  {item.name}
+                  {isUnavailable && (
+                    <span className="ml-2 text-xs font-medium text-destructive">
+                      No disponible
+                    </span>
+                  )}
+                </p>
+                <p className="text-sm text-blux-600">
+                  {formatSoles(item.price)} · subtotal {formatSoles(item.price * item.quantity)}
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1 rounded-full border">
                   <button
                     aria-label={`Quitar uno de ${item.name}`}
-                    className="px-2.5 py-1.5 text-lg leading-none"
+                    className="px-3 py-1.5 text-lg leading-none"
                     onClick={() => decrement(item.productId)}
                   >
                     −
@@ -102,7 +100,7 @@ export function CartView({ deliveryFee }: { deliveryFee: number }) {
                   <span className="w-6 text-center font-semibold">{item.quantity}</span>
                   <button
                     aria-label={`Agregar uno de ${item.name}`}
-                    className="px-2.5 py-1.5 text-lg leading-none"
+                    className="px-3 py-1.5 text-lg leading-none"
                     onClick={() => increment(item.productId)}
                   >
                     +
@@ -119,10 +117,10 @@ export function CartView({ deliveryFee }: { deliveryFee: number }) {
                   <Trash2 className="size-4" aria-hidden />
                 </button>
               </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+            </li>
+          );
+        })}
+      </ul>
 
       <div className="mt-2 space-y-1.5 rounded-lg border p-4 text-sm">
         <div className="flex justify-between text-muted-foreground">
