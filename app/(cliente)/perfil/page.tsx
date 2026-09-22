@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { CircleUserRound, MapPin, Phone, Save, Trash2 } from "lucide-react";
+import { CircleUserRound, KeyRound, MapPin, Phone, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,13 +19,11 @@ const PHONE_RE = /^9\d{8}$/;
 
 export default function PerfilPage() {
   const mounted = useMounted();
-  const [profile, setProfile] = useState<CustomerProfile>({ name: "", phone: "", reference: "" });
-
-  useEffect(() => {
-    if (!mounted) return;
-    const saved = getProfile();
-    if (saved) setProfile(saved);
-  }, [mounted]);
+  // Inicialización perezosa: localStorage solo existe en el navegador.
+  const [profile, setProfile] = useState<CustomerProfile>(() => {
+    if (typeof window === "undefined") return { name: "", phone: "", reference: "" };
+    return getProfile() ?? { name: "", phone: "", reference: "" };
+  });
 
   const set = (key: keyof CustomerProfile) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setProfile((p) => ({ ...p, [key]: e.target.value }));
@@ -117,6 +115,17 @@ export default function PerfilPage() {
           <Trash2 className="size-4 mr-1.5" aria-hidden /> Borrar mis datos de este teléfono
         </Button>
       </section>
+
+      {/* Acceso discreto al panel del personal (admin, cocina, delivery) */}
+      <div className="mt-2 border-t border-border/60 pt-3 text-center">
+        <Link
+          href="/admin/login"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <KeyRound className="size-3.5" aria-hidden />
+          Acceso personal
+        </Link>
+      </div>
     </main>
   );
 }

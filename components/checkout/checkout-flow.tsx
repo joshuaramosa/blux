@@ -35,12 +35,20 @@ export function CheckoutFlow({ settings }: { settings: BusinessSettings | null }
   const [error, setError] = useState<string | null>(null);
   const [order, setOrder] = useState<{ token: string; number: number } | null>(null);
 
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  // Precarga perezosa del perfil guardado en el teléfono (tab Perfil / compras previas).
+  // Inicialización perezosa: evita setState dentro de un efecto.
+  const [name, setName] = useState(() =>
+    typeof window === "undefined" ? "" : getProfile()?.name ?? "",
+  );
+  const [phone, setPhone] = useState(() =>
+    typeof window === "undefined" ? "" : getProfile()?.phone ?? "",
+  );
 
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [gpsStatus, setGpsStatus] = useState<"idle" | "loading" | "error">("idle");
-  const [reference, setReference] = useState("");
+  const [reference, setReference] = useState(() =>
+    typeof window === "undefined" ? "" : getProfile()?.reference ?? "",
+  );
 
   const [paymentMethod, setPaymentMethod] = useState<"YAPE" | "CONTRA_ENTREGA" | null>(null);
   const [proofFile, setProofFile] = useState<File | null>(null);
@@ -56,18 +64,6 @@ export function CheckoutFlow({ settings }: { settings: BusinessSettings | null }
       if (proofPreview) URL.revokeObjectURL(proofPreview);
     };
   }, [proofPreview]);
-
-  // Precarga los datos guardados en el teléfono (tab Perfil / compras previas).
-  useEffect(() => {
-    const saved = getProfile();
-    if (saved) {
-      setName(saved.name);
-      setPhone(saved.phone);
-      setReference(saved.reference);
-    }
-    // solo al montar
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   if (!mounted) return null;
 
