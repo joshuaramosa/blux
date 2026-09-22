@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { useCart, useCartSubtotal } from "@/hooks/use-cart";
 import { useMounted } from "@/hooks/use-mounted";
 import { createOrder } from "@/app/checkout/actions";
+import { saveOrder } from "@/lib/order-memory";
+import { getProfile, saveProfile } from "@/lib/customer-profile";
 import { formatSoles } from "@/lib/business";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,6 +57,18 @@ export function CheckoutFlow({ settings }: { settings: BusinessSettings | null }
     };
   }, [proofPreview]);
 
+  // Precarga los datos guardados en el teléfono (tab Perfil / compras previas).
+  useEffect(() => {
+    const saved = getProfile();
+    if (saved) {
+      setName(saved.name);
+      setPhone(saved.phone);
+      setReference(saved.reference);
+    }
+    // solo al montar
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (!mounted) return null;
 
   // ---------- Carrito vacío ----------
@@ -81,10 +95,13 @@ export function CheckoutFlow({ settings }: { settings: BusinessSettings | null }
           <span className="font-bold text-blux-600">#{String(order.number).padStart(3, "0")}</span>
         </p>
         <p className="text-sm text-muted-foreground">
-          Te avisaremos cuando lo estemos preparando.
+          Te avisaremos cuando lo estemos preparando. Este pedido quedó guardado en tu teléfono.
         </p>
         <Button asChild size="lg" className="w-full max-w-xs">
           <Link href={`/pedido/${order.token}`}>Ver estado de mi pedido</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href="/mis-pedidos">Mis pedidos</Link>
         </Button>
         <Button asChild variant="ghost">
           <Link href="/carta">Volver a la carta</Link>
@@ -162,6 +179,13 @@ export function CheckoutFlow({ settings }: { settings: BusinessSettings | null }
         toast.error(result.error);
       } else {
         clear();
+        saveProfile({ name, phone, reference });
+        saveOrder({
+          token: result.trackingToken,
+          number: result.orderNumber,
+          total,
+          placedAt: new Date().toISOString(),
+        });
         setOrder({ token: result.trackingToken, number: result.orderNumber });
         window.scrollTo({ top: 0 });
       }

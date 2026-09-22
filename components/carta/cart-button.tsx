@@ -14,8 +14,9 @@ export function CartButton() {
 
   if (!mounted || count === 0) return null;
 
+  // Flota sobre la barra de navegación inferior del cliente (bottom nav)
   return (
-    <div className="fixed inset-x-0 bottom-0 z-30 p-3">
+    <div className="fixed inset-x-0 bottom-20 z-30 p-3 pb-1">
       <Link
         href="/carrito"
         className="mx-auto flex max-w-md items-center justify-between rounded-full bg-primary px-5 py-3.5 text-primary-foreground shadow-lg"
