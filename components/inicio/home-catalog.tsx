@@ -64,7 +64,9 @@ export function HomeCatalog({
   closed: boolean;
 }) {
   const [query, setQuery] = useState("");
-  const [activeSlug, setActiveSlug] = useState<string | null>(categories[0]?.slug ?? null);
+  // Por defecto se muestran TODOS los platos (antes quedaba filtrado a la
+  // primera categoría y parecía que solo había 2 productos).
+  const [activeSlug, setActiveSlug] = useState<string | null>(null);
   const addItem = useCart((s) => s.addItem);
 
   const searching = query.trim().length > 0;
@@ -116,6 +118,19 @@ export function HomeCatalog({
         role="tablist"
         aria-label="Categorías"
       >
+        <button
+          role="tab"
+          aria-selected={activeSlug === null && !searching}
+          onClick={() => setActiveSlug(null)}
+          className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition-all ${
+            activeSlug === null && !searching
+              ? "bg-[#f04e1e] text-white shadow-md shadow-[#f04e1e]/30"
+              : "bg-white text-stone-600 border border-black/5 hover:text-stone-900"
+          }`}
+        >
+          <span aria-hidden>🍴</span>
+          Todos
+        </button>
         {categories.map((c) => {
           const active = activeSlug === c.slug && !searching;
           return (
@@ -224,17 +239,17 @@ export function HomeCatalog({
                       {p.description}
                     </p>
                   )}
-                  <div className="mt-auto flex items-center justify-between gap-2 pt-2">
-                    <span className="text-sm font-extrabold text-stone-900 whitespace-nowrap">
+                  <div className="mt-auto flex flex-col gap-1.5 pt-2">
+                    <span className="text-sm font-extrabold text-stone-900">
                       {formatSoles(Number(p.price))}
                     </span>
                     <Button
                       size="sm"
                       onClick={(e) => add(p, e)}
                       disabled={closed}
-                      className="h-9 rounded-xl bg-[#f04e1e] px-3.5 text-[11px] font-extrabold uppercase tracking-wide text-white shadow-sm hover:bg-[#d8431a] active:scale-95"
+                      className="h-8 w-full rounded-xl bg-[#f04e1e] px-2 text-[10px] font-extrabold uppercase tracking-wide text-white shadow-sm hover:bg-[#d8431a] active:scale-95"
                     >
-                      <ShoppingCart className="size-3.5 mr-1" aria-hidden />
+                      <ShoppingCart className="size-3 mr-1" aria-hidden />
                       Agregar
                     </Button>
                   </div>

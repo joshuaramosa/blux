@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CircleUserRound, KeyRound, MapPin, Phone, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { InstallAppButton } from "@/components/cliente/install-app-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -104,6 +105,7 @@ export default function PerfilPage() {
       </section>
 
       <section className="flex flex-col gap-2">
+        <InstallAppButton />
         <Button asChild variant="outline" className="w-full">
           <Link href="/mis-pedidos">Ver mis pedidos anteriores</Link>
         </Button>

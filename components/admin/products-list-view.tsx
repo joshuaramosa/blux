@@ -269,14 +269,20 @@ export function ProductsListView({
         </div>
       )}
 
-      {/* Modal Formulario */}
-      <ProductFormDialog
-        product={editingProduct}
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        categories={categories}
-        onSaved={() => router.refresh()}
-      />
+      {/* Modal Formulario.
+          La key fuerza un remontaje al abrir/editar para que los useState
+          se inicialicen con los valores correctos (fix: formulario "sucio"
+          al alternar entre Nuevo y Editar). */}
+      {isFormOpen && (
+        <ProductFormDialog
+          key={editingProduct?.id ?? "nuevo-producto"}
+          product={editingProduct}
+          isOpen={isFormOpen}
+          onClose={() => setIsFormOpen(false)}
+          categories={categories}
+          onSaved={() => router.refresh()}
+        />
+      )}
     </div>
   );
 }

@@ -65,6 +65,7 @@ export async function createOrder(
       .from("payment-proofs")
       .upload(proofPath, buffer, { contentType: proofFile.type });
     if (upErr) {
+      console.error("[createOrder] Error subiendo comprobante:", upErr.message, upErr);
       return { ok: false, error: "No pudimos subir el comprobante. Inténtalo de nuevo." };
     }
   }
@@ -87,6 +88,7 @@ export async function createOrder(
   });
 
   if (error) {
+    console.error("[createOrder] Error RPC create_order:", error.message, error);
     if (proofPath) await supabase.storage.from("payment-proofs").remove([proofPath]);
     return { ok: false, error: mapRpcError(error.message) };
   }
@@ -97,14 +99,26 @@ export async function createOrder(
     tracking_token: string;
   };
 
-  // Mover el comprobante a la carpeta definitiva del pedido y registrarlo
+  // Mover el comprobante a la carpeta definitiva del pedido y registrarlo.
+  // Estos pasos NO deben tumbar el pedido ya creado: solo se registran en log.
   if (proofPath) {
-    const finalPath = `${order_id}/comprobante${proofPath.slice(proofPath.lastIndexOf("."))}`;
-    await supabase.storage.from("payment-proofs").move(proofPath, finalPath);
-    await supabase
-      .from("payments")
-      .update({ proof_url: finalPath })
-      .eq("order_id", order_id);
+    try {
+      const finalPath = `${order_id}/comprobante${proofPath.slice(proofPath.lastIndexOf("."))}`;
+      const { error: moveErr } = await supabase.storage
+        .from("payment-proofs")
+        .move(proofPath, finalPath);
+      if (moveErr) {
+        console.error("[createOrder] No se pudo mover el comprobante (se usa ruta temporal):", moveErr.message);
+      }
+      const effectivePath = moveErr ? proofPath : finalPath;
+      const { error: payErr } = await supabase
+        .from("payments")
+        .update({ proof_url: effectivePath })
+        .eq("order_id", order_id);
+      if (payErr) console.error("[createOrder] No se pudo registrar proof_url:", payErr.message);
+    } catch (e) {
+      console.error("[createOrder] Excepción registrando comprobante:", e);
+    }
   }
 
   return { ok: true, trackingToken: tracking_token, orderNumber: order_number };

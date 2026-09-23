@@ -44,18 +44,10 @@ export function ProductFormDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Sincronizar campos cuando se abre para edición
+  // El diálogo se remonta (key) cada vez que se abre con otro producto,
+  // así que los estados ya vienen inicializados correctamente.
   const handleOpenChange = (open: boolean) => {
-    if (open) {
-      setName(product?.name || "");
-      setDescription(product?.description || "");
-      setPrice(product ? product.price.toString() : "");
-      setCategoryId(product?.category_id || (categories[0]?.id ?? ""));
-      setImageUrl(product?.image_url || "");
-      setIsAvailable(product ? product.is_available : true);
-    } else {
-      onClose();
-    }
+    if (!open) onClose();
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
