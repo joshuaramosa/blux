@@ -5,6 +5,7 @@ import { formatSoles } from "@/lib/business";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { OrderTracker } from "@/components/pedido/order-tracker";
+import { LiveDeliveryCard } from "@/components/pedido/live-delivery-card";
 import type { OrderStatus } from "@/types";
 
 export const metadata = { title: "Estado de tu pedido — BLUX" };
@@ -35,6 +36,9 @@ export default async function PedidoPage({ params }: { params: Promise<{ token: 
       </header>
 
       <OrderTracker orderId={order.id} initialStatus={order.status as OrderStatus} />
+
+      {/* Mapa en vivo del motorizado mientras EN_CAMINO */}
+      <LiveDeliveryCard token={token} />
 
       <Card>
         <CardContent className="flex flex-col gap-2 p-4 text-sm">

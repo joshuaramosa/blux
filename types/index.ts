@@ -101,6 +101,9 @@ export type DeliveryAssignment = {
   picked_up_at: string | null;
   delivered_at: string | null;
   created_at: string;
+  last_lat: number | null;
+  last_lng: number | null;
+  location_updated_at: string | null;
   delivery_user?: StaffUser;
 };
 

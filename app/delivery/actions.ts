@@ -47,6 +47,51 @@ export async function startDelivery(assignmentId: string, orderId: string) {
   return { success: true };
 }
 
+/** El repartidor emite su GPS mientras está EN_CAMINO (tracking en vivo del cliente).
+ *  RLS: solo puede actualizar su propia asignación. */
+export async function updateDriverLocation(
+  assignmentId: string,
+  lat: number,
+  lng: number,
+) {
+  const auth = await requireDeliveryStaff();
+  if (auth.error) return auth;
+
+  // Coordenadas plausibles (evita datos corruptos del GPS)
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+    return { error: "Coordenadas inválidas" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("delivery_assignments")
+    .update({
+      last_lat: lat,
+      last_lng: lng,
+      location_updated_at: new Date().toISOString(),
+    })
+    .eq("id", assignmentId)
+    .eq("delivery_user_id", auth.userId!)
+    .eq("status", "EN_CAMINO");
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+/** Deja de compartir ubicación de una asignación (privacidad post-entrega). */
+export async function clearDriverLocation(assignmentId: string) {
+  const auth = await requireDeliveryStaff();
+  if (auth.error) return auth;
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("delivery_assignments")
+    .update({ last_lat: null, last_lng: null, location_updated_at: null })
+    .eq("id", assignmentId)
+    .eq("delivery_user_id", auth.userId!);
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
 /** EN_CAMINO → ENTREGADO */
 export async function markDelivered(assignmentId: string, orderId: string) {
   const auth = await requireDeliveryStaff();
@@ -55,9 +100,16 @@ export async function markDelivered(assignmentId: string, orderId: string) {
   const supabase = await createClient();
   const now = new Date().toISOString();
 
+  // Se limpia la posición: el cliente deja de ver al motorizado al entregar
   const { error: aErr } = await supabase
     .from("delivery_assignments")
-    .update({ status: "ENTREGADO", delivered_at: now })
+    .update({
+      status: "ENTREGADO",
+      delivered_at: now,
+      last_lat: null,
+      last_lng: null,
+      location_updated_at: null,
+    })
     .eq("id", assignmentId)
     .eq("status", "EN_CAMINO");
   if (aErr) return { error: aErr.message };

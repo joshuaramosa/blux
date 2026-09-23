@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useRealtime } from "@/hooks/use-realtime";
+import { useDriverLocation } from "@/hooks/use-driver-location";
 import {
   startDelivery,
   markDelivered,
@@ -50,6 +51,11 @@ export function DeliveryBoard({ initial }: { initial: AssignedDelivery[] }) {
     () => router.refresh(),
   );
 
+  // Tracking en vivo: mientras tenga entregas EN_CAMINO, comparte su GPS
+  // para que el cliente lo vea en el mapa (/pedido/[token]).
+  const activeIds = items.filter((a) => a.status === "EN_CAMINO").map((a) => a.id).sort();
+  const gpsState = useDriverLocation(activeIds);
+
   // Reordenamiento LOCAL exclusivamente: jamás cambia order_number ni el orden en la base
   const move = (index: number, dir: -1 | 1) => {
     setItems((list) => {
@@ -66,7 +72,7 @@ export function DeliveryBoard({ initial }: { initial: AssignedDelivery[] }) {
     setLoadingId(null);
     if (res.error) toast.error(res.error);
     else {
-      toast.success(`🛵 En camino con el pedido #${a.orders.order_number}`);
+      toast.success(`🛵 En camino con el pedido #${a.orders.order_number}. Tu ubicación se compartirá con el cliente.`);
       router.refresh();
     }
   };
@@ -95,6 +101,26 @@ export function DeliveryBoard({ initial }: { initial: AssignedDelivery[] }) {
       <p className="text-sm text-muted-foreground">
         {items.length} entrega(s) pendiente(s) · usa ▲▼ para ordenar tu ruta
       </p>
+
+      {gpsState === "live" && (
+        <p className="flex items-center gap-2 rounded-lg bg-green-600/10 px-3 py-2 text-sm font-medium text-green-700">
+          <span className="relative flex size-2.5" aria-hidden>
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+            <span className="relative inline-flex size-2.5 rounded-full bg-green-600" />
+          </span>
+          Compartiendo tu ubicación en vivo con el cliente
+        </p>
+      )}
+      {gpsState === "starting" && (
+        <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
+          📡 Activando GPS para compartir tu ubicación…
+        </p>
+      )}
+      {gpsState === "error" && activeIds.length > 0 && (
+        <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          ⚠️ No pudimos activar tu GPS (revisa el permiso o abre la app con HTTPS). El cliente no verá tu ubicación en vivo.
+        </p>
+      )}
 
       {items.length === 0 && (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center">
