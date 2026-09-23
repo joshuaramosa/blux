@@ -51,10 +51,13 @@ export function DeliveryBoard({ initial }: { initial: AssignedDelivery[] }) {
     () => router.refresh(),
   );
 
-  // Tracking en vivo: mientras tenga entregas EN_CAMINO, comparte su GPS
-  // para que el cliente lo vea en el mapa (/pedido/[token]).
+  // Tracking en vivo: el repartidor activa el GPS con un botón (el gesto
+  // del usuario hace que el navegador pida el permiso de ubicación).
+  const [shareGps, setShareGps] = useState(false);
   const activeIds = items.filter((a) => a.status === "EN_CAMINO").map((a) => a.id).sort();
-  const gpsState = useDriverLocation(activeIds);
+  const gpsState = useDriverLocation(activeIds, shareGps);
+  // Sin entregas en camino, el compartir queda apagado
+  if (activeIds.length === 0 && shareGps) setShareGps(false);
 
   // Reordenamiento LOCAL exclusivamente: jamás cambia order_number ni el orden en la base
   const move = (index: number, dir: -1 | 1) => {
@@ -102,24 +105,52 @@ export function DeliveryBoard({ initial }: { initial: AssignedDelivery[] }) {
         {items.length} entrega(s) pendiente(s) · usa ▲▼ para ordenar tu ruta
       </p>
 
+      {activeIds.length > 0 && gpsState === "off" && (
+        <Button
+          variant="secondary"
+          size="lg"
+          className="h-12 font-bold"
+          onClick={() => setShareGps(true)}
+        >
+          📡 COMPARTIR MI UBICACIÓN EN VIVO
+        </Button>
+      )}
       {gpsState === "live" && (
-        <p className="flex items-center gap-2 rounded-lg bg-green-600/10 px-3 py-2 text-sm font-medium text-green-700">
-          <span className="relative flex size-2.5" aria-hidden>
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
-            <span className="relative inline-flex size-2.5 rounded-full bg-green-600" />
-          </span>
-          Compartiendo tu ubicación en vivo con el cliente
-        </p>
+        <div className="flex items-center justify-between gap-2 rounded-lg bg-green-600/10 px-3 py-2">
+          <p className="flex items-center gap-2 text-sm font-medium text-green-700">
+            <span className="relative flex size-2.5" aria-hidden>
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+              <span className="relative inline-flex size-2.5 rounded-full bg-green-600" />
+            </span>
+            Compartiendo tu ubicación en vivo con el cliente
+          </p>
+          <button
+            type="button"
+            onClick={() => setShareGps(false)}
+            className="text-xs font-bold text-green-700 underline"
+          >
+            Detener
+          </button>
+        </div>
       )}
       {gpsState === "starting" && (
         <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
-          📡 Activando GPS para compartir tu ubicación…
+          📡 Activando GPS… El navegador te pedirá permiso de ubicación: acéptalo.
         </p>
       )}
       {gpsState === "error" && activeIds.length > 0 && (
-        <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
-          ⚠️ No pudimos activar tu GPS (revisa el permiso o abre la app con HTTPS). El cliente no verá tu ubicación en vivo.
-        </p>
+        <div className="flex items-center justify-between gap-2 rounded-lg bg-destructive/10 px-3 py-2">
+          <p className="text-sm text-destructive">
+            ⚠️ No pudimos activar tu GPS. Revisa el permiso de ubicación en el navegador o abre la app con HTTPS.
+          </p>
+          <button
+            type="button"
+            onClick={() => { setShareGps(false); setTimeout(() => setShareGps(true), 50); }}
+            className="shrink-0 text-xs font-bold text-destructive underline"
+          >
+            Reintentar
+          </button>
+        </div>
       )}
 
       {items.length === 0 && (

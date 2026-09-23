@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CircleUserRound, KeyRound, MapPin, Phone, Save, Trash2 } from "lucide-react";
+import { CircleUserRound, KeyRound, MapPin, Pencil, Phone, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { InstallAppButton } from "@/components/cliente/install-app-button";
@@ -25,6 +25,12 @@ export default function PerfilPage() {
     if (typeof window === "undefined") return { name: "", phone: "", reference: "" };
     return getProfile() ?? { name: "", phone: "", reference: "" };
   });
+  // Si ya hay perfil guardado en el teléfono, arranca en modo lectura
+  // (botón "Modificar"); si no, directo a editar (botón "Guardar").
+  const [editing, setEditing] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return !getProfile()?.name;
+  });
 
   const set = (key: keyof CustomerProfile) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setProfile((p) => ({ ...p, [key]: e.target.value }));
@@ -39,12 +45,16 @@ export default function PerfilPage() {
       phone: profile.phone.trim(),
       reference: profile.reference.trim(),
     });
+    setEditing(false);
     toast.success("Perfil guardado en este teléfono");
   };
+
+  const onModify = () => setEditing(true);
 
   const onClear = () => {
     clearProfile();
     setProfile({ name: "", phone: "", reference: "" });
+    setEditing(true);
     toast.success("Datos borrados de este teléfono");
   };
 
@@ -67,7 +77,7 @@ export default function PerfilPage() {
       <section className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="p-name">Tu nombre</Label>
-          <Input id="p-name" placeholder="Ej. Rosa Gutiérrez" value={profile.name} onChange={set("name")} />
+          <Input id="p-name" placeholder="Ej. Rosa Gutiérrez" value={profile.name} onChange={set("name")} disabled={!editing} />
         </div>
 
         <div className="flex flex-col gap-1.5">
@@ -81,6 +91,7 @@ export default function PerfilPage() {
             value={profile.phone}
             onChange={set("phone")}
             maxLength={9}
+            disabled={!editing}
           />
         </div>
 
@@ -93,15 +104,26 @@ export default function PerfilPage() {
             placeholder="Ej. Casa azul con puerta negra, frente al parque"
             value={profile.reference}
             onChange={set("reference")}
+            disabled={!editing}
           />
         </div>
 
-        <Button
-          onClick={onSave}
-          className="mt-1 h-11 rounded-xl bg-blux-600 font-bold text-white hover:bg-blux-700 active:scale-95"
-        >
-          <Save className="size-4 mr-1.5" aria-hidden /> Guardar
-        </Button>
+        {editing ? (
+          <Button
+            onClick={onSave}
+            className="mt-1 h-11 rounded-xl bg-blux-600 font-bold text-white hover:bg-blux-700 active:scale-95"
+          >
+            <Save className="size-4 mr-1.5" aria-hidden /> Guardar
+          </Button>
+        ) : (
+          <Button
+            onClick={onModify}
+            variant="outline"
+            className="mt-1 h-11 rounded-xl font-bold active:scale-95"
+          >
+            <Pencil className="size-4 mr-1.5" aria-hidden /> Modificar
+          </Button>
+        )}
       </section>
 
       <section className="flex flex-col gap-2">

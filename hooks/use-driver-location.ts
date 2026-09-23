@@ -22,9 +22,11 @@ export type DriverGpsState = "off" | "starting" | "live" | "error";
 /**
  * Comparte el GPS del repartidor mientras tenga entregas EN_CAMINO.
  * `activeIds`: assignment ids con status EN_CAMINO.
- * Se detiene solo cuando ya no hay entregas en camino o se desmonta.
+ * `enabled`: el repartidor lo activa con un botón — el gesto del usuario
+ * garantiza que el navegador muestre el diálogo de permiso de ubicación.
+ * Se detiene cuando se desactiva, no hay entregas en camino o se desmonta.
  */
-export function useDriverLocation(activeIds: string[]): DriverGpsState {
+export function useDriverLocation(activeIds: string[], enabled: boolean): DriverGpsState {
   const [state, setState] = useState<DriverGpsState>("off");
   const lastSentAt = useRef(0);
   const lastPos = useRef<{ lat: number; lng: number } | null>(null);
@@ -32,7 +34,7 @@ export function useDriverLocation(activeIds: string[]): DriverGpsState {
 
   useEffect(() => {
     const ids = key ? key.split(",") : [];
-    if (ids.length === 0) {
+    if (!enabled || ids.length === 0) {
       setState("off");
       return;
     }
@@ -75,7 +77,7 @@ export function useDriverLocation(activeIds: string[]): DriverGpsState {
     return () => navigator.geolocation.clearWatch(watchId);
     // key ya resume el contenido de activeIds
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
+  }, [key, enabled]);
 
   return state;
 }
