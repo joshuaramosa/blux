@@ -5,8 +5,11 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Blux Sabor de Casa",
     short_name: "BLUX",
     description: "Pide tu comida favorita: caldo de gallina, mostritos, broaster y más.",
+    id: "/",
     start_url: "/",
+    scope: "/",
     display: "standalone",
+    orientation: "portrait",
     background_color: "#ffffff",
     theme_color: "#E4572E",
     icons: [
