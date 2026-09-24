@@ -9,6 +9,7 @@ import {
   Users,
   TrendingUp,
   Settings,
+  Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +42,12 @@ const NAV_ITEMS = [
     label: "Ventas",
     href: "/admin/ventas",
     icon: TrendingUp,
+    exact: false,
+  },
+  {
+    label: "Promos",
+    href: "/admin/promociones",
+    icon: Megaphone,
     exact: false,
   },
   {

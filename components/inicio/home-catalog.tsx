@@ -8,7 +8,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { formatSoles } from "@/lib/business";
-import type { Category, Product } from "@/types";
+import { PromoReel } from "./promo-reel";
+import type { Category, Product, Promotion } from "@/types";
 
 /** Ícono por categoría según el mockup (fallback 🍽️). */
 function categoryIcon(cat: Category): string {
@@ -56,11 +57,13 @@ export function HomeCatalog({
   categories,
   products,
   featured,
+  promotions,
   closed,
 }: {
   categories: Category[];
   products: Product[];
   featured: Product | null;
+  promotions: Promotion[];
   closed: boolean;
 }) {
   const [query, setQuery] = useState("");
@@ -152,8 +155,12 @@ export function HomeCatalog({
         })}
       </div>
 
-      {/* Plato destacado: texto sobre la imagen, como en el mockup */}
-      {featured && !searching && (
+      {/* Reel de promociones: solo imagen, avanza solo cada 5 s.
+          Reemplaza al plato destacado cuando hay promos activas. */}
+      {!searching && promotions.length > 0 && <PromoReel promotions={promotions} />}
+
+      {/* Plato destacado (fallback cuando no hay promociones) */}
+      {promotions.length === 0 && featured && !searching && (
         <section className="px-4" aria-label="Plato destacado">
           <div className="relative aspect-[4/3.4] overflow-hidden rounded-3xl shadow-lg">
             {featured.image_url || fallbackImage(featured.name) ? (

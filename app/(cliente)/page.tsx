@@ -4,7 +4,7 @@ import { isOpenNow } from "@/lib/business";
 import { BluxLogo } from "@/components/ui/blux-logo";
 import { CartHeaderButton } from "@/components/cliente/cart-header-button";
 import { HomeCatalog } from "@/components/inicio/home-catalog";
-import type { Category, Product, BusinessSettings } from "@/types";
+import type { Category, Product, BusinessSettings, Promotion } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -19,17 +19,20 @@ function to12h(hhmm: string): string {
 export default async function HomePage() {
   const supabase = await createClient();
 
-  const [{ data: categories }, { data: products }, { data: settings }] = await Promise.all([
-    supabase.from("categories").select("*").eq("is_active", true).order("sort_order"),
-    supabase.from("products").select("*").eq("is_available", true).order("sort_order"),
-    supabase.from("business_settings").select("*").single(),
-  ]);
+  const [{ data: categories }, { data: products }, { data: settings }, { data: promos }] =
+    await Promise.all([
+      supabase.from("categories").select("*").eq("is_active", true).order("sort_order"),
+      supabase.from("products").select("*").eq("is_available", true).order("sort_order"),
+      supabase.from("business_settings").select("*").single(),
+      supabase.from("promotions").select("*").eq("is_active", true).order("sort_order"),
+    ]);
 
   const cats = (categories ?? []) as Category[];
   const prods = (products ?? []) as Product[];
   const config = settings as BusinessSettings | null;
   const closed = config ? !isOpenNow(config) : false;
   const featured = prods[0] ?? null;
+  const promotions = (promos ?? []) as Promotion[];
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-[#faf7f2] font-sans">
@@ -87,7 +90,13 @@ export default async function HomePage() {
         </div>
       </header>
 
-      <HomeCatalog categories={cats} products={prods} featured={featured} closed={closed} />
+      <HomeCatalog
+        categories={cats}
+        products={prods}
+        featured={featured}
+        promotions={promotions}
+        closed={closed}
+      />
     </main>
   );
 }

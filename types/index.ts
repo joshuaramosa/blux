@@ -107,6 +107,14 @@ export type DeliveryAssignment = {
   delivery_user?: StaffUser;
 };
 
+export type Promotion = {
+  id: string;
+  image_url: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+};
+
 export type StaffUser = {
   id: string;
   full_name: string;
