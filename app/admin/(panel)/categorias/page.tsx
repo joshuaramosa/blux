@@ -1,10 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
+import { requireRole } from "@/lib/auth/guards";
 import { CategoriesView } from "@/components/admin/categories-view";
 import type { Category } from "@/types";
 
 export const metadata = { title: "Categorías — BLUX Admin" };
 
 export default async function AdminCategoriasPage() {
+  await requireRole(["ADMIN"]);
   const supabase = await createClient();
 
   const { data } = await supabase

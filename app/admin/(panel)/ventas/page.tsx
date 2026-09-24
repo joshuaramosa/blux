@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { requireRole } from "@/lib/auth/guards";
 import { SalesView } from "@/components/admin/sales-view";
 import type { OrderWithDetails, Payment } from "@/types";
 
@@ -9,6 +10,7 @@ type RawOrder = Omit<OrderWithDetails, "payment"> & {
 };
 
 export default async function AdminVentasPage() {
+  await requireRole(["ADMIN"]);
   const supabase = await createClient();
 
   const { data: ordersData } = await supabase

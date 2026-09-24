@@ -73,7 +73,7 @@ export function OrderDetailDialog({
     setLoadingAction(newStatus);
     const res = await updateOrderStatus(order.id, newStatus);
     setLoadingAction(null);
-    if (res?.success) {
+    if (!res.error) {
       if (onOrderUpdated) onOrderUpdated();
       onClose();
     }
@@ -83,7 +83,7 @@ export function OrderDetailDialog({
     setLoadingAction(`payment-${status}`);
     const res = await verifyPaymentProof(order.id, status);
     setLoadingAction(null);
-    if (res?.success) {
+    if (!res.error) {
       if (onOrderUpdated) onOrderUpdated();
     }
   };
@@ -93,7 +93,7 @@ export function OrderDetailDialog({
     setLoadingAction("assign");
     const res = await assignDelivery(order.id, selectedRepartidor);
     setLoadingAction(null);
-    if (res?.success) {
+    if (!res.error) {
       if (onOrderUpdated) onOrderUpdated();
       onClose();
     }
@@ -104,7 +104,7 @@ export function OrderDetailDialog({
     setLoadingProof(true);
     const res = await getPaymentProofUrl(order.payment.proof_url);
     setLoadingProof(false);
-    if (res.url) {
+    if ("url" in res && res.url) {
       setProofPreviewUrl(res.url);
     }
   };

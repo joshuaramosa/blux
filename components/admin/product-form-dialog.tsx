@@ -61,7 +61,7 @@ export function ProductFormDialog({
     const res = await uploadProductImage(formData);
     setIsUploading(false);
 
-    if (res.url) {
+    if ("url" in res && res.url) {
       setImageUrl(res.url);
       toast.success("Imagen subida con éxito");
     } else {

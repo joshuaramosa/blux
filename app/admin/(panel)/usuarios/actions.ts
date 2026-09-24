@@ -108,6 +108,17 @@ export async function toggleStaffActive(userId: string, current: boolean) {
   const supabase = await createClient();
   const { data: userAuth } = await supabase.auth.getUser();
 
+  // Consistente con create/update: solo ADMIN gestiona el personal
+  const { data: adminUser } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", userAuth.user?.id ?? "")
+    .single();
+
+  if (adminUser?.role !== "ADMIN") {
+    return { error: "Solo los administradores pueden activar o desactivar personal." };
+  }
+
   if (userAuth.user?.id === userId) {
     return { error: "No puedes desactivar tu propia cuenta." };
   }

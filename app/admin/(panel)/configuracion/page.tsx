@@ -6,7 +6,7 @@ import type { BusinessSettings } from "@/types";
 export const metadata = { title: "Configuración — BLUX Admin" };
 
 export default async function AdminConfiguracionPage() {
-  const staff = await requireRole(["ADMIN", "ATENCION"]);
+  const staff = await requireRole(["ADMIN"]);
   const supabase = await createClient();
 
   const { data: settingsData } = await supabase

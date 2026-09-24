@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireStaffRole } from "@/lib/auth/guards";
 
 export async function updateBusinessSettings(formData: FormData) {
   const supabase = await createClient();
@@ -47,6 +48,10 @@ export async function updateBusinessSettings(formData: FormData) {
 }
 
 export async function uploadBusinessAsset(formData: FormData) {
+  // El service role bypasea RLS: la verificación de rol es OBLIGATORIA aquí
+  const auth = await requireStaffRole(["ADMIN"]);
+  if (auth.error) return auth;
+
   const file = formData.get("file") as File;
   const prefix = (formData.get("prefix") as string) || "asset";
 

@@ -12,10 +12,14 @@ export default async function LoginPage() {
   if (data.user) {
     const { data: staff } = await supabase
       .from("users")
-      .select("role")
+      .select("role, is_active")
       .eq("id", data.user.id)
       .single();
-    redirect(homeByRole(staff?.role as UserRole));
+    // Solo redirigir si el personal está ACTIVO; si está desactivado se muestra
+    // el formulario (evita el bucle: guard -> login -> home -> guard -> …)
+    if (staff?.is_active) {
+      redirect(homeByRole(staff.role as UserRole));
+    }
   }
 
   return (

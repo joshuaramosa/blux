@@ -1,10 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
+import { requireRole } from "@/lib/auth/guards";
 import { ProductsListView } from "@/components/admin/products-list-view";
 import type { Product, Category } from "@/types";
 
 export const metadata = { title: "Gestión de Productos — BLUX Admin" };
 
 export default async function AdminProductosPage() {
+  await requireRole(["ADMIN"]);
   const supabase = await createClient();
 
   const [{ data: productsData }, { data: categoriesData }] = await Promise.all([

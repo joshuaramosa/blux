@@ -72,7 +72,7 @@ export function SettingsForm({
     if (type === "logo") setUploadingLogo(false);
     else setUploadingQr(false);
 
-    if (res.url) {
+    if ("url" in res && res.url) {
       if (type === "logo") setLogoUrl(res.url);
       else setQrUrl(res.url);
       toast.success(`${type === "logo" ? "Logo" : "QR"} subido correctamente`);

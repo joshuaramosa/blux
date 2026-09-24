@@ -19,52 +19,61 @@ const NAV_ITEMS = [
     href: "/admin",
     icon: LayoutDashboard,
     exact: true,
+    roles: null, // ambos roles del panel
   },
   {
     label: "Pedidos",
     href: "/admin/pedidos",
     icon: ShoppingBag,
     exact: false,
+    roles: null,
   },
   {
     label: "Carta",
     href: "/admin/productos",
     icon: UtensilsCrossed,
     exact: false,
+    roles: ["ADMIN"],
   },
   {
     label: "Clientes",
     href: "/admin/clientes",
     icon: Users,
     exact: false,
+    roles: null,
   },
   {
     label: "Ventas",
     href: "/admin/ventas",
     icon: TrendingUp,
     exact: false,
+    roles: ["ADMIN"],
   },
   {
     label: "Promos",
     href: "/admin/promociones",
     icon: Megaphone,
     exact: false,
+    roles: ["ADMIN"],
   },
   {
     label: "Ajustes",
     href: "/admin/configuracion",
     icon: Settings,
     exact: false,
+    roles: ["ADMIN"],
   },
 ];
 
-export function AdminBottomNav() {
+export function AdminBottomNav({ role = "ADMIN" }: { role?: string }) {
   const pathname = usePathname();
+  // Solo mostrar los módulos que el rol realmente puede usar
+  const items = NAV_ITEMS.filter((i) => !i.roles || i.roles.includes(role));
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t bg-background/95 backdrop-blur-md pb-safe">
       <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-1.5">
-        {NAV_ITEMS.map((item) => {
+        {items.map((item) => {
           const isActive = item.exact
             ? pathname === item.href
             : pathname.startsWith(item.href);

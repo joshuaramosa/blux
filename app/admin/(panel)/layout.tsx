@@ -19,7 +19,7 @@ export default async function AdminLayout({
         actions={<AdminRealtime />}
       />
       <div className="flex-1 pb-20">{children}</div>
-      <AdminBottomNav />
+      <AdminBottomNav role={staff.role} />
     </div>
   );
 }

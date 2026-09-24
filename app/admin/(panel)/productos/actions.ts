@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireStaffRole } from "@/lib/auth/guards";
 
 export async function toggleProductAvailability(productId: string, isAvailable: boolean) {
   const supabase = await createClient();
@@ -86,6 +87,10 @@ export async function deleteProduct(productId: string) {
 }
 
 export async function uploadProductImage(formData: FormData) {
+  // El service role bypasea RLS: la verificación de rol es OBLIGATORIA aquí
+  const auth = await requireStaffRole(["ADMIN"]);
+  if (auth.error) return auth;
+
   const file = formData.get("file") as File;
   if (!file || file.size === 0) {
     return { error: "No se seleccionó ningún archivo." };
