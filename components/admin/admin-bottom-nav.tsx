@@ -71,7 +71,7 @@ export function AdminBottomNav({ role = "ADMIN" }: { role?: string }) {
   const items = NAV_ITEMS.filter((i) => !i.roles || i.roles.includes(role));
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t bg-background/95 backdrop-blur-md pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-gradient-to-b from-[#141a26] to-[#0b0e14] shadow-[0_-4px_20px_rgba(0,0,0,0.35)] backdrop-blur-md pb-safe">
       <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-1.5">
         {items.map((item) => {
           const isActive = item.exact
@@ -83,20 +83,16 @@ export function AdminBottomNav({ role = "ADMIN" }: { role?: string }) {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1 rounded-lg py-1 text-[11px] font-medium transition-colors touch-manipulation active:scale-95",
+                "flex flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 py-1.5 text-[11px] transition-all duration-200 touch-manipulation active:scale-95",
                 isActive
-                  ? "text-primary font-semibold"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-[#f04e1e] font-bold text-white shadow-lg shadow-[#f04e1e]/40"
+                  : "font-medium text-stone-400 hover:text-stone-100"
               )}
             >
-              <div
-                className={cn(
-                  "flex h-7 w-7 items-center justify-center rounded-full transition-all",
-                  isActive && "bg-primary/10"
-                )}
-              >
-                <Icon className={cn("h-4 w-4", isActive && "stroke-[2.5px]")} />
+              <div className="flex h-6 w-6 items-center justify-center">
+                <Icon className={cn("h-4.5 w-4.5", isActive && "stroke-[2.5px]")} />
               </div>
               <span>{item.label}</span>
             </Link>
