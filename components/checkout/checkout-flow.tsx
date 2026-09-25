@@ -13,6 +13,7 @@ import { formatSoles } from "@/lib/business";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { TermsNote } from "@/components/cliente/terms-note";
 import type { BusinessSettings } from "@/types";
 
 const LocationMap = dynamic(() => import("./location-map"), {
@@ -478,6 +479,7 @@ export function CheckoutFlow({ settings }: { settings: BusinessSettings | null }
         <Button type="submit" size="lg" className="h-14 w-full text-base font-bold" disabled={sending}>
           {sending ? "Enviando…" : "CONFIRMAR PEDIDO"}
         </Button>
+        <TermsNote accion="Al confirmar tu pedido y guardar tus datos," />
       </form>
     </main>
   );

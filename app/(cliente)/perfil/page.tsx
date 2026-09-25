@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CircleUserRound, KeyRound, MapPin, Pencil, Phone, Save, Trash2 } from "lucide-react";
+import { CircleUserRound, KeyRound, MapPin, Pencil, Phone, Save, ScrollText, Trash2 } from "lucide-react";
+import { TermsNote } from "@/components/cliente/terms-note";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { InstallAppButton } from "@/components/cliente/install-app-button";
@@ -109,12 +110,15 @@ export default function PerfilPage() {
         </div>
 
         {editing ? (
-          <Button
-            onClick={onSave}
-            className="mt-1 h-11 rounded-xl bg-blux-600 font-bold text-white hover:bg-blux-700 active:scale-95"
-          >
-            <Save className="size-4 mr-1.5" aria-hidden /> Guardar
-          </Button>
+          <>
+            <Button
+              onClick={onSave}
+              className="mt-1 h-11 rounded-xl bg-blux-600 font-bold text-white hover:bg-blux-700 active:scale-95"
+            >
+              <Save className="size-4 mr-1.5" aria-hidden /> Guardar
+            </Button>
+            <TermsNote accion="Al guardar tus datos," />
+          </>
         ) : (
           <Button
             onClick={onModify}
@@ -130,6 +134,11 @@ export default function PerfilPage() {
         <InstallAppButton />
         <Button asChild variant="outline" className="w-full">
           <Link href="/mis-pedidos">Ver mis pedidos anteriores</Link>
+        </Button>
+        <Button asChild variant="outline" className="w-full gap-2">
+          <Link href="/terminos">
+            <ScrollText className="size-4" aria-hidden /> Términos y Condiciones
+          </Link>
         </Button>
         <Button
           variant="ghost"
