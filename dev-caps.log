@@ -1,0 +1,225 @@
+
+> blux-sabor-casa@0.1.0 dev
+> next dev
+
+▲ Next.js 16.3.5 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.56.1:3000
+- Environments: .env.local
+✓ Ready in 4.2s
+✓ Running next.config.ts took 252ms
+- Experiments (use with caution):
+  · serverActions
+
+ GET / 200 in 1637ms (next.js: 153ms, proxy.ts: 490ms, application-code: 994ms)
+ GET / 200 in 1017ms (next.js: 6ms, proxy.ts: 5ms, application-code: 1006ms)
+ GET /carta 200 in 1175ms (next.js: 482ms, proxy.ts: 4ms, application-code: 689ms)
+[browser] Image with src "/dishes/caldo-de-gallina.jpg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/dishes/mostrito-broaster.jpg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /carrito 200 in 598ms (next.js: 306ms, proxy.ts: 4ms, application-code: 289ms)
+ GET /checkout 200 in 1304ms (next.js: 842ms, proxy.ts: 5ms, application-code: 457ms)
+ GET /pedido/FC6666142E 200 in 1474ms (next.js: 976ms, proxy.ts: 4ms, application-code: 493ms)
+ GET /admin/login 200 in 116ms (next.js: 43ms, proxy.ts: 3ms, application-code: 70ms)
+ GET /admin 200 in 1268ms (next.js: 58ms, proxy.ts: 400ms, application-code: 809ms)
+ POST /admin/login 200 in 2.4s (next.js: 5ms, proxy.ts: 5ms, application-code: 2.3s)
+  └─ ƒ login(null, {}) in 1054ms app/admin/login/actions.ts
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+ GET /admin/pedidos 200 in 1628ms (next.js: 252ms, proxy.ts: 603ms, application-code: 773ms)
+ GET /admin 200 in 598ms (next.js: 7ms, proxy.ts: 558ms, application-code: 33ms)
+⨯ Error: The destination stream closed early.
+    at ignore-listed frames {
+  digest: '2144766952'
+}
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
+      <LoadingBoundary name="admin/" loading={null}>
+        <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+          <RedirectBoundary>
+            <RedirectErrorBoundary router={{...}}>
+              <InnerLayoutRouter url="/admin/ped..." tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>
+                <SegmentViewNode type="layout" pagePath="admin/(pan...">
+                  <SegmentTrieNode>
+                  <script>
+                  <script>
+                  <script>
+                  <script>
+                  <AdminLayout>
+                    <div className="flex min-h...">
+                      <StaffHeader>
+                        <header className="sticky top...">
+                          <div>
+                          <div className="flex items...">
+                            <AdminRealtime>
+                              <button
+                                onClick={function toggleSound}
++                               aria-pressed={true}
+-                               aria-pressed="false"
++                               title="Desactivar sonido de pedidos nuevos"
+-                               title="Activar sonido de pedidos nuevos"
+                                className="rounded-full p-2 text-muted-foreground hover:bg-muted"
+                              >
+                                <Volume2 className="size-4" aria-hidden={true}>
+                                  <svg
+                                    ref={null}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width={24}
+                                    height={24}
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
++                                   className="lucide lucide-volume-2 size-4"
+-                                   className="lucide lucide-volume-x size-4"
+                                    aria-hidden={true}
+                                  >
+                                    <path
++                                     d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0..."
+-                                     d="M11 4.702a.7.7 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0..."
+                                    >
+                                    <path
++                                     d="M16 9a5 5 0 0 1 0 6"
+-                                     d="m16.5 14.5 5-5"
+                                    >
+                                    <path
++                                     d="M19.364 18.364a9 9 0 0 0 0-12.728"
+-                                     d="m16.5 9.5 5 5"
+                                    >
+                            ...
+                      ...
+              ...
+    ...
+ 
+ GET /admin/pedidos 200 in 837ms (next.js: 10ms, proxy.ts: 385ms, application-code: 442ms)
+ GET /admin/login 200 in 51ms (next.js: 5ms, proxy.ts: 3ms, application-code: 42ms)
+ GET /cocina 200 in 1098ms (next.js: 290ms, proxy.ts: 385ms, application-code: 423ms)
+ POST /admin/login 200 in 1832ms (next.js: 5ms, proxy.ts: 4ms, application-code: 1823ms)
+  └─ ƒ login(null, {}) in 713ms app/admin/login/actions.ts
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+ GET /cocina 200 in 885ms (next.js: 5ms, proxy.ts: 379ms, application-code: 501ms)
+ GET /pedido/FC6666142E 200 in 454ms (next.js: 17ms, proxy.ts: 4ms, application-code: 433ms)
+ GET /cocina 200 in 678ms (next.js: 14ms, proxy.ts: 621ms, application-code: 43ms)
+⨯ Error: The destination stream closed early.
+    at ignore-listed frames {
+  digest: '2144766952'
+}
+[browser] Uncaught Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <InnerScrollHandlerNew focusAndScrollRef={{scrollRef:null, ...}} cacheNode={{rsc:{...}, ...}}>
+      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
+        <LoadingBoundary name="cocina/" loading={null}>
+          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+            <RedirectBoundary>
+              <RedirectErrorBoundary router={{...}}>
+                <InnerLayoutRouter url="/cocina" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>
+                  <SegmentViewNode type="page" pagePath="cocina/pag...">
+                    <SegmentTrieNode>
+                    <CocinaPage>
+                      <KitchenBoard initialOrders={[...]}>
+                        <main className="mx-auto fl...">
+                          <div className="flex items...">
+                            <p>
+                            <Button variant="outline" size="sm" onClick={function KitchenBoard.useCallback[toggleSound]} ...>
+                              <button
+                                data-slot="button"
+                                data-variant="outline"
+                                data-size="sm"
+                                className={"group/button inline-flex shrink-0 items-center justify-center border bg-c..."}
+                                onClick={function KitchenBoard.useCallback[toggleSound]}
++                               aria-pressed={true}
+-                               aria-pressed="false"
+                              >
+                                <Volume2 className="mr-1 size-4" aria-hidden={true}>
+                                  <svg
+                                    ref={null}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width={24}
+                                    height={24}
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
++                                   className="lucide lucide-volume-2 mr-1 size-4"
+-                                   className="lucide lucide-volume-x mr-1 size-4"
+                                    aria-hidden={true}
+                                  >
+                                    <path
++                                     d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0..."
+-                                     d="M11 4.702a.7.7 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0..."
+                                    >
+                                    <path
++                                     d="M16 9a5 5 0 0 1 0 6"
+-                                     d="m16.5 14.5 5-5"
+                                    >
+                                    <path
++                                     d="M19.364 18.364a9 9 0 0 0 0-12.728"
+-                                     d="m16.5 9.5 5 5"
+                                    >
++                               {" Sonido activado"}
+-                               {" Sonido desactivado"}
+                          ...
+                  ...
+                ...
+      ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at button (<anonymous>)
+    at Button (components/ui/button.tsx:56:5)
+    at KitchenBoard (components/cocina/kitchen-board.tsx:145:9)
+    at CocinaPage (app\cocina\page.tsx:21:10)
+  54 |
+  55 |   return (
+> 56 |     <Comp
+     |     ^
+  57 |       data-slot="button"
+  58 |       data-variant={variant}
+  59 |       data-size={size}
+ GET /cocina 200 in 803ms (next.js: 6ms, proxy.ts: 388ms, application-code: 409ms)
+ GET /pedido/FC6666142E 200 in 254ms (next.js: 20ms, proxy.ts: 3ms, application-code: 230ms)
+ GET /admin/login 200 in 49ms (next.js: 8ms, proxy.ts: 3ms, application-code: 38ms)
+ GET /delivery 200 in 1584ms (next.js: 449ms, proxy.ts: 359ms, application-code: 776ms)
+ POST /admin/login 200 in 2.4s (next.js: 6ms, proxy.ts: 5ms, application-code: 2.4s)
+  └─ ƒ login(null, {}) in 822ms app/admin/login/actions.ts
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+ GET /delivery 200 in 973ms (next.js: 6ms, proxy.ts: 349ms, application-code: 618ms)
+ GET /delivery 200 in 600ms (next.js: 5ms, proxy.ts: 567ms, application-code: 28ms)
+⨯ Error: The destination stream closed early.
+    at ignore-listed frames {
+  digest: '2144766952'
+}
+ GET /delivery 200 in 990ms (next.js: 15ms, proxy.ts: 352ms, application-code: 622ms)
+ GET /delivery 200 in 819ms (next.js: 5ms, proxy.ts: 364ms, application-code: 450ms)
+ GET /delivery 200 in 774ms (next.js: 6ms, proxy.ts: 351ms, application-code: 417ms)
+ GET /pedido/FC6666142E 200 in 249ms (next.js: 14ms, proxy.ts: 4ms, application-code: 231ms)
+ GET /pedido/FC6666142E 200 in 431ms (next.js: 13ms, proxy.ts: 4ms, application-code: 414ms)
+ GET /mis-pedidos 200 in 260ms (next.js: 212ms, proxy.ts: 3ms, application-code: 44ms)
+ POST /mis-pedidos 200 in 216ms (next.js: 6ms, proxy.ts: 4ms, application-code: 206ms)
+  └─ ƒ getOrderSummaries(["FC6666142E"]) in 195ms app/(cliente)/mis-pedidos/actions.ts

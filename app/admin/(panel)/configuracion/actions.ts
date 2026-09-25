@@ -6,6 +6,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStaffRole } from "@/lib/auth/guards";
 
 export async function updateBusinessSettings(formData: FormData) {
+  const auth = await requireStaffRole(["ADMIN"]);
+  if (auth.error) return auth;
+
   const supabase = await createClient();
 
   const business_name = (formData.get("business_name") as string)?.trim() || "BLUX Sabor de Casa";
@@ -18,10 +21,24 @@ export async function updateBusinessSettings(formData: FormData) {
   const is_open = formData.get("is_open") === "true";
   const logo_url = (formData.get("logo_url") as string)?.trim() || null;
   const qr_url = (formData.get("qr_url") as string)?.trim() || null;
+  const store_lat_raw = (formData.get("store_lat") as string)?.trim();
+  const store_lng_raw = (formData.get("store_lng") as string)?.trim();
+  const store_lat = store_lat_raw ? Number(store_lat_raw) : null;
+  const store_lng = store_lng_raw ? Number(store_lng_raw) : null;
+  // La ubicación del local requiere ambas coordenadas válidas o ninguna
+  const storeOk =
+    (store_lat == null && store_lng == null) ||
+    (store_lat != null && store_lng != null &&
+      Number.isFinite(store_lat) && Number.isFinite(store_lng) &&
+      Math.abs(store_lat) <= 90 && Math.abs(store_lng) <= 180);
+
+  if (!storeOk) return { error: "La ubicación del local es inválida." };
 
   const { error } = await supabase
     .from("business_settings")
     .update({
+      store_lat: storeOk ? store_lat : null,
+      store_lng: storeOk ? store_lng : null,
       business_name,
       whatsapp,
       yape_number,

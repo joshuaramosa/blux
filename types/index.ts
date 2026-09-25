@@ -48,6 +48,8 @@ export type BusinessSettings = {
   is_open: boolean;
   logo_url: string | null;
   qr_url: string | null;
+  store_lat: number | null;
+  store_lng: number | null;
 };
 
 export type Customer = {

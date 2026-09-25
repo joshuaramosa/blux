@@ -23,6 +23,8 @@ type Tracking = {
   driver_lng: number | null;
   driver_updated_at: string | null;
   driver_name: string | null;
+  store_lat: number | null;
+  store_lng: number | null;
 };
 
 /** Distancia haversine en km */
@@ -106,13 +108,15 @@ export function LiveDeliveryCard({ token }: { token: string }) {
         {hasGps ? (
           <>
             <LiveDeliveryMap
-              driverLat={tracking.driver_lat!}
-              driverLng={tracking.driver_lng!}
+              driverLat={tracking.driver_lat}
+              driverLng={tracking.driver_lng}
               destLat={tracking.dest_lat}
               destLng={tracking.dest_lng}
+              storeLat={tracking.store_lat}
+              storeLng={tracking.store_lng}
             />
             <p className="text-xs text-muted-foreground">
-              🛵 tu pedido · 🏠 tu dirección{eta == null && " · comparte tu ubicación en el checkout para estimar la llegada"}
+              🛵 tu pedido · 🏠 tu dirección · 🏪 local{eta == null && " · comparte tu ubicación en el checkout para estimar la llegada"}
             </p>
           </>
         ) : (

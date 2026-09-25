@@ -21,9 +21,21 @@ import {
   ChevronRight,
   QrCode,
   Image as ImageIcon,
+  MapPin,
+  Navigation,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const StoreLocationPicker = dynamic(() => import("./store-location-picker"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-52 w-full items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">
+      Cargando mapa…
+    </div>
+  ),
+});
 
 interface SettingsFormProps {
   initialSettings: BusinessSettings;
@@ -45,6 +57,9 @@ export function SettingsForm({
   const [isOpen, setIsOpen] = useState(initialSettings.is_open);
   const [logoUrl, setLogoUrl] = useState(initialSettings.logo_url || "/logo.png");
   const [qrUrl, setQrUrl] = useState(initialSettings.qr_url || "");
+  const [storeLat, setStoreLat] = useState<number | null>(initialSettings.store_lat ?? null);
+  const [storeLng, setStoreLng] = useState<number | null>(initialSettings.store_lng ?? null);
+  const [gpsLoading, setGpsLoading] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -96,6 +111,10 @@ export function SettingsForm({
     formData.append("is_open", isOpen ? "true" : "false");
     formData.append("logo_url", logoUrl);
     formData.append("qr_url", qrUrl);
+    if (storeLat != null && storeLng != null) {
+      formData.append("store_lat", storeLat.toFixed(7));
+      formData.append("store_lng", storeLng.toFixed(7));
+    }
 
     const res = await updateBusinessSettings(formData);
     setIsSubmitting(false);
@@ -257,6 +276,64 @@ export function SettingsForm({
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Ubicación fija del local (origen de los repartos) */}
+        <div className="rounded-2xl border bg-card p-4 shadow-xs space-y-3">
+          <div className="flex items-center gap-2 text-primary">
+            <MapPin className="h-4 w-4" />
+            <div>
+              <h3 className="text-sm font-bold text-foreground">Ubicación del local</h3>
+              <p className="text-[11px] text-muted-foreground">
+                Punto de origen de los repartos. Cámbiala si el negocio se muda.
+              </p>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full h-11 text-sm font-bold"
+            disabled={gpsLoading}
+            onClick={() => {
+              if (!window.isSecureContext || !navigator.geolocation) {
+                toast.error("El GPS necesita HTTPS. Marca la ubicación tocando el mapa.");
+                return;
+              }
+              setGpsLoading(true);
+              navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                  setStoreLat(pos.coords.latitude);
+                  setStoreLng(pos.coords.longitude);
+                  setGpsLoading(false);
+                  toast.success("Ubicación del local fijada con tu GPS 📍");
+                },
+                (err) => {
+                  console.error("[settings] GPS del local:", err.code, err.message);
+                  setGpsLoading(false);
+                  toast.error("No pudimos obtener tu ubicación. Toca el mapa para fijarla.");
+                },
+                { enableHighAccuracy: true, timeout: 15000 },
+              );
+            }}
+          >
+            <Navigation className="h-4 w-4 mr-1.5" aria-hidden />
+            {gpsLoading ? "Obteniendo ubicación…" : "Usar mi ubicación actual (estoy en el local)"}
+          </Button>
+
+          <StoreLocationPicker
+            lat={storeLat}
+            lng={storeLng}
+            onChange={(la, ln) => { setStoreLat(la); setStoreLng(ln); }}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            🏪 Toca el mapa para mover el pin exactamente a la puerta del local.
+            {storeLat != null && storeLng != null && (
+              <span className="ml-1 font-mono">
+                ({storeLat.toFixed(5)}, {storeLng.toFixed(5)})
+              </span>
+            )}
+          </p>
         </div>
 
         {/* Datos de Yape */}

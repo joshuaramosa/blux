@@ -16,23 +16,25 @@ function emojiIcon(emoji: string, bg: string) {
 
 const driverIcon = emojiIcon("🛵", "#f04e1e");
 const destIcon = emojiIcon("🏠", "#16a34a");
+const storeIcon = emojiIcon("🏪", "#0f172a");
 
 /** Encuadra el mapa para ver motorizado y destino a la vez (suave). */
-function FitBoth({
+function FitAll({
   driver,
-  dest,
+  others,
 }: {
-  driver: [number, number];
-  dest: [number, number] | null;
+  driver: [number, number] | null;
+  others: [number, number][];
 }) {
   const map = useMap();
   useEffect(() => {
-    if (dest) {
-      map.fitBounds(L.latLngBounds([driver, dest]).pad(0.3), { animate: true });
-    } else {
-      map.setView(driver, map.getZoom(), { animate: true });
+    const points = [...(driver ? [driver] : []), ...others];
+    if (points.length > 1) {
+      map.fitBounds(L.latLngBounds(points).pad(0.3), { animate: true });
+    } else if (points.length === 1) {
+      map.setView(points[0], 16, { animate: true });
     }
-  }, [driver[0], driver[1], dest?.[0], dest?.[1], map]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [driver?.[0], driver?.[1], others.length, map]); // eslint-disable-line react-hooks/exhaustive-deps
   return null;
 }
 
@@ -41,19 +43,28 @@ export default function LiveDeliveryMap({
   driverLng,
   destLat,
   destLng,
+  storeLat,
+  storeLng,
 }: {
-  driverLat: number;
-  driverLng: number;
+  driverLat: number | null;
+  driverLng: number | null;
   destLat: number | null;
   destLng: number | null;
+  storeLat: number | null;
+  storeLng: number | null;
 }) {
-  const driver: [number, number] = [driverLat, driverLng];
+  const driver: [number, number] | null =
+    driverLat != null && driverLng != null ? [driverLat, driverLng] : null;
   const dest: [number, number] | null =
     destLat != null && destLng != null ? [destLat, destLng] : null;
+  const store: [number, number] | null =
+    storeLat != null && storeLng != null ? [storeLat, storeLng] : null;
+
+  const center = driver ?? dest ?? store ?? [-11.40519, -75.68105];
 
   return (
     <MapContainer
-      center={driver}
+      center={center}
       zoom={16}
       scrollWheelZoom={false}
       className="h-64 w-full rounded-lg"
@@ -62,9 +73,10 @@ export default function LiveDeliveryMap({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Marker position={driver} icon={driverIcon} />
+      {driver && <Marker position={driver} icon={driverIcon} />}
       {dest && <Marker position={dest} icon={destIcon} />}
-      <FitBoth driver={driver} dest={dest} />
+      {store && <Marker position={store} icon={storeIcon} />}
+      <FitAll driver={driver} others={[dest, store].filter((p): p is [number, number] => p != null)} />
     </MapContainer>
   );
 }
