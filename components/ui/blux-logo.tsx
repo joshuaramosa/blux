@@ -9,6 +9,7 @@ export interface BluxLogoProps {
   className?: string;
   asLink?: boolean;
   href?: string;
+  logoUrl?: string;
 }
 
 const SIZES = {
@@ -27,6 +28,7 @@ export function BluxLogo({
   className,
   asLink = false,
   href = "/",
+  logoUrl,
 }: BluxLogoProps) {
   const content = (
     <div
@@ -38,16 +40,13 @@ export function BluxLogo({
       )}
     >
       <Image
-        src="/logo.png"
+        src={logoUrl || "/logo.png"}
         alt="EL BLUX Restaurante & Delivery — Sabor de Casa"
         width={1828}
         height={860}
         priority={priority}
-        className={cn(
-          "object-contain transition-transform duration-300",
-          asLink && "hover:scale-[1.03] active:scale-[0.98]",
-          SIZES[size]
-        )}
+        className="object-contain transition-transform duration-300"
+        draggable={false}
       />
     </div>
   );
