@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { DashboardView } from "@/components/admin/dashboard-view";
-import { isOpenNow } from "@/lib/business";
+import { isOpenNow, startOfTodayLimaISO } from "@/lib/business";
 import type {
   OrderWithDetails,
   StaffUser,
@@ -53,11 +53,8 @@ export default async function AdminDashboardPage() {
 
   const businessIsOpen = isOpenNow(settings);
 
-  // 2. Pedidos de hoy (o los más recientes en caso de entorno de pruebas)
-  // Calculamos el inicio del día en hora Perú (UTC-5)
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-
+  // 2. Pedidos de hoy (00:00 hora Perú). Antes se traían los últimos 100 de
+  // la historia completa y el dashboard los contaba como "de hoy".
   const { data: ordersData } = await supabase
     .from("orders")
     .select(`
@@ -71,8 +68,9 @@ export default async function AdminDashboardPage() {
         delivery_user:users(*)
       )
     `)
+    .gte("created_at", startOfTodayLimaISO())
     .order("created_at", { ascending: false })
-    .limit(100);
+    .limit(200);
 
   const orders: OrderWithDetails[] = normalizeOrders(
     (ordersData ?? []) as unknown as RawOrder[],

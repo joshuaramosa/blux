@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
-import { formatSoles } from "@/lib/business";
+import { formatSoles, isTodayInLima, limaMonthKey } from "@/lib/business";
 import type { OrderWithDetails } from "@/types";
 import {
   TrendingUp,
@@ -21,26 +21,15 @@ export function SalesView({ orders }: SalesViewProps) {
 
   const filteredOrders = useMemo(() => {
     const now = new Date();
+    // Las comparaciones de fecha usan el calendario de Perú (America/Lima),
+    // no la zona horaria del dispositivo.
     return orders.filter((o) => {
-      const orderDate = new Date(o.created_at);
-
-      if (period === "TODAY") {
-        return (
-          orderDate.getDate() === now.getDate() &&
-          orderDate.getMonth() === now.getMonth() &&
-          orderDate.getFullYear() === now.getFullYear()
-        );
-      }
+      if (period === "TODAY") return isTodayInLima(o.created_at);
       if (period === "7DAYS") {
-        const diffDays = (now.getTime() - orderDate.getTime()) / (1000 * 3600 * 24);
+        const diffDays = (now.getTime() - new Date(o.created_at).getTime()) / (1000 * 3600 * 24);
         return diffDays <= 7;
       }
-      if (period === "MONTH") {
-        return (
-          orderDate.getMonth() === now.getMonth() &&
-          orderDate.getFullYear() === now.getFullYear()
-        );
-      }
+      if (period === "MONTH") return limaMonthKey(o.created_at) === limaMonthKey(new Date());
       return true;
     });
   }, [orders, period]);
