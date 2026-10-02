@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Star, ShoppingCart } from "lucide-react";
+import { Search, Star, ShoppingCart, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
@@ -110,11 +110,37 @@ export function HomeCatalog({
     toast.success(`${p.name} agregado al carrito`);
   };
 
+  // Compartir la carta: usa el menú nativo del teléfono (WhatsApp, etc.)
+  const shareMenu = async () => {
+    const url = window.location.origin + "/carta";
+    const data = {
+      title: "EL BLUX — Sabor de Casa",
+      text: "🍗 Mira la carta de EL BLUX y pide tu delivery aquí",
+      url,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(data);
+        return;
+      } catch {
+        /* usuario canceló */
+      }
+      return;
+    }
+    // Fallback: copiar el enlace
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Enlace de la carta copiado 📋");
+    } catch {
+      window.prompt("Copia el enlace de la carta:", url);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-5 pb-6">
-      {/* Buscador */}
-      <div className="px-4 pt-3">
-        <label className="flex items-center gap-2 rounded-full border border-black/5 bg-white px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-[#f04e1e]/40">
+      {/* Buscador + compartir la carta (viraliza por WhatsApp) */}
+      <div className="px-4 pt-3 flex items-center gap-2">
+        <label className="flex flex-1 items-center gap-2 rounded-full border border-black/5 bg-white px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-[#f04e1e]/40">
           <Search className="size-5 shrink-0 text-stone-400" aria-hidden />
           <input
             type="search"
@@ -124,6 +150,14 @@ export function HomeCatalog({
             className="w-full bg-transparent text-sm text-stone-800 outline-none placeholder:text-stone-400"
           />
         </label>
+        <button
+          type="button"
+          aria-label="Compartir la carta"
+          onClick={shareMenu}
+          className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#f04e1e] text-white shadow-md shadow-[#f04e1e]/30 transition-transform active:scale-90"
+        >
+          <Share2 className="size-5" aria-hidden />
+        </button>
       </div>
 
       {/* Chips de categorías con ícono */}
