@@ -45,7 +45,7 @@ export function BluxLogo({
         width={1828}
         height={860}
         priority={priority}
-        className="object-contain transition-transform duration-300"
+        className={cn("object-contain transition-transform duration-300", SIZES[size])}
         draggable={false}
       />
     </div>
