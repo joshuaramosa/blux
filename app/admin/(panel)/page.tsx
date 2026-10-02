@@ -92,7 +92,7 @@ export default async function AdminDashboardPage() {
   const { data: settlementsData } = await supabase.rpc("get_settlements");
 
   return (
-    <main className="max-w-3xl mx-auto p-4 space-y-4">
+    <main className="max-w-6xl mx-auto p-4 lg:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold tracking-tight">Inicio</h1>

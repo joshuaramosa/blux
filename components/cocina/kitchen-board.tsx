@@ -27,7 +27,12 @@ export function KitchenBoard({ initialOrders }: { initialOrders: OrderWithDetail
   const SOUND_KEY = "blux-cocina-sonido";
   const soundIsOn = () =>
     typeof window !== "undefined" && localStorage.getItem(SOUND_KEY) !== "off";
-  const [soundOn, setSoundOn] = useState(soundIsOn);
+  // Valor inicial fijo (= servidor); localStorage se lee tras montar (evita mismatch de hidratación)
+  const [soundOn, setSoundOn] = useState(true);
+  useEffect(() => {
+    setSoundOn(soundIsOn());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [, setTick] = useState(0); // re-render cada minuto para actualizar "hace X min"
 
@@ -137,7 +142,7 @@ export function KitchenBoard({ initialOrders }: { initialOrders: OrderWithDetail
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 p-4 pb-8">
+    <main className="mx-auto flex w-full max-w-md md:max-w-3xl xl:max-w-5xl flex-1 flex-col gap-4 p-4 pb-8 lg:p-6">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
           {orders.length} pedido(s) en cola
@@ -165,27 +170,30 @@ export function KitchenBoard({ initialOrders }: { initialOrders: OrderWithDetail
         </div>
       )}
 
-      {pending.length > 0 && (
-        <section aria-label="Pendientes de preparar" className="flex flex-col gap-3">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
-            🆕 Por preparar ({pending.length})
-          </h2>
-          {pending.map((o) => (
-            <OrderCard key={o.id} order={o} />
-          ))}
-        </section>
-      )}
+      {/* Tablet/PC: dos columnas (solicitados | preparando) */}
+      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start">
+        {pending.length > 0 && (
+          <section aria-label="Pendientes de preparar" className="flex flex-col gap-3">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
+              🆕 Por preparar ({pending.length})
+            </h2>
+            {pending.map((o) => (
+              <OrderCard key={o.id} order={o} />
+            ))}
+          </section>
+        )}
 
-      {cooking.length > 0 && (
-        <section aria-label="En preparación" className="flex flex-col gap-3">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
-            🔥 En preparación ({cooking.length})
-          </h2>
-          {cooking.map((o) => (
-            <OrderCard key={o.id} order={o} />
-          ))}
-        </section>
-      )}
+        {cooking.length > 0 && (
+          <section aria-label="En preparación" className="flex flex-col gap-3">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
+              🔥 En preparación ({cooking.length})
+            </h2>
+            {cooking.map((o) => (
+              <OrderCard key={o.id} order={o} />
+            ))}
+          </section>
+        )}
+      </div>
     </main>
   );
 }

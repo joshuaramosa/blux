@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   {
     label: "Inicio",
     href: "/admin",
@@ -71,7 +71,7 @@ export function AdminBottomNav({ role = "ADMIN" }: { role?: string }) {
   const items = NAV_ITEMS.filter((i) => !i.roles || i.roles.includes(role));
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-gradient-to-b from-[#141a26] to-[#0b0e14] shadow-[0_-4px_20px_rgba(0,0,0,0.35)] backdrop-blur-md pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-gradient-to-b from-[#141a26] to-[#0b0e14] shadow-[0_-4px_20px_rgba(0,0,0,0.35)] backdrop-blur-md pb-safe md:hidden">
       <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-1.5">
         {items.map((item) => {
           const isActive = item.exact

@@ -205,7 +205,7 @@ export function OrdersListView({
           </p>
         </div>
       ) : (
-        <div className="space-y-2.5">
+        <div className="space-y-2.5 md:grid md:grid-cols-2 md:gap-3 md:space-y-0 xl:grid-cols-3">
           {filteredOrders.map((order) => {
             const timeStr = new Date(order.created_at).toLocaleTimeString("es-PE", {
               hour: "2-digit",
