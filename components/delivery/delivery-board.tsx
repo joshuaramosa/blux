@@ -2,15 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import {
-  Navigation,
   Package,
   Phone,
   ChevronUp,
   ChevronDown,
   CheckCircle2,
   Bike,
+  Map as MapIcon,
+  MapPinned,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,6 +24,16 @@ import {
   markDelivered,
 } from "@/app/delivery/actions";
 import type { Address, Customer, DeliveryAssignment, OrderWithDetails } from "@/types";
+
+// Mapa de navegación in-app (Leaflet + OSRM), sin Google Maps
+const RouteMap = dynamic(() => import("@/components/mapa/route-map"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-64 w-full items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">
+      Cargando mapa…
+    </div>
+  ),
+});
 
 export type AssignedDelivery = DeliveryAssignment & {
   orders: OrderWithDetails & { customer: Customer; address: Address };
@@ -92,12 +104,8 @@ export function DeliveryBoard({ initial }: { initial: AssignedDelivery[] }) {
     }
   };
 
-  const mapsUrl = (address: Address) => {
-    if (address.lat != null && address.lng != null) {
-      return `https://www.google.com/maps/dir/?api=1&destination=${address.lat},${address.lng}`;
-    }
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address.address)}`;
-  };
+  // Mapa expandible por tarjeta (NULL = todas plegadas)
+  const [mapOpenId, setMapOpenId] = useState<string | null>(null);
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 p-4 pb-8">
@@ -222,11 +230,31 @@ export function DeliveryBoard({ initial }: { initial: AssignedDelivery[] }) {
                 </span>
               </div>
 
-              <Button variant="secondary" size="lg" className="h-14 text-base" asChild>
-                <a href={mapsUrl(order.address)} target="_blank" rel="noopener noreferrer">
-                  <Navigation className="mr-2 size-5" aria-hidden /> NAVEGAR
-                </a>
-              </Button>
+              {order.address.lat != null && order.address.lng != null ? (
+                <>
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="h-14 text-base"
+                    onClick={() => setMapOpenId(mapOpenId === a.id ? null : a.id)}
+                  >
+                    <MapIcon className="mr-2 size-5" aria-hidden />
+                    {mapOpenId === a.id ? "OCULTAR MAPA" : "VER RUTA"}
+                  </Button>
+                  {mapOpenId === a.id && (
+                    <RouteMap
+                      destLat={order.address.lat}
+                      destLng={order.address.lng}
+                      watchDriver={onTheWay}
+                    />
+                  )}
+                </>
+              ) : (
+                <p className="rounded-lg bg-amber-500/10 px-3 py-2 text-center text-xs font-medium text-amber-700">
+                  <MapPinned className="mr-1 inline-block size-4" aria-hidden />
+                  Esta dirección no tiene GPS. Guíate con la referencia escrita de arriba.
+                </p>
+              )}
 
               {confirming ? (
                 <div className="flex gap-2">

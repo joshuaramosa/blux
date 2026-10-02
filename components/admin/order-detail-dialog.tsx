@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +17,6 @@ import {
   Phone,
   MessageCircle,
   MapPin,
-  Navigation,
   CheckCircle2,
   XCircle,
   ChefHat,
@@ -25,6 +25,16 @@ import {
   Eye,
   Loader2,
 } from "lucide-react";
+
+// Mini-mapa in-app (Leaflet/OSM), sin Google Maps
+const RouteMap = dynamic(() => import("@/components/mapa/route-map"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-56 w-full items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">
+      Cargando mapa…
+    </div>
+  ),
+});
 import {
   updateOrderStatus,
   verifyPaymentProof,
@@ -61,13 +71,7 @@ export function OrderDetailDialog({
     `Hola ${order.customer?.full_name}, te escribimos de BLUX Sabor de Casa respecto a tu pedido #${order.order_number}.`
   )}`;
 
-  const mapQuery =
-    order.address?.lat && order.address?.lng
-      ? `${order.address.lat},${order.address.lng}`
-      : encodeURIComponent(`${order.address?.address || ""} ${order.address?.reference || ""}`);
-
-  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
-  const wazeUrl = `https://waze.com/ul?q=${mapQuery}`;
+  const hasCoords = order.address?.lat != null && order.address?.lng != null;
 
   const handleStatusChange = async (newStatus: OrderStatus) => {
     setLoadingAction(newStatus);
@@ -164,20 +168,17 @@ export function OrderDetailDialog({
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-1">
-                <Button asChild size="sm" variant="secondary" className="flex-1 h-9 gap-1 text-xs">
-                  <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
-                    <Navigation className="h-3.5 w-3.5" />
-                    Google Maps
-                  </a>
-                </Button>
-                <Button asChild size="sm" variant="secondary" className="flex-1 h-9 gap-1 text-xs">
-                  <a href={wazeUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    Waze
-                  </a>
-                </Button>
-              </div>
+              {hasCoords ? (
+                <RouteMap
+                  destLat={order.address!.lat}
+                  destLng={order.address!.lng}
+                  heightClass="h-56"
+                />
+              ) : (
+                <p className="rounded-lg bg-amber-500/10 px-3 py-2 text-[11px] font-medium text-amber-700">
+                  📍 El cliente no compartió GPS. Guíate con la referencia escrita.
+                </p>
+              )}
             </div>
 
             {/* Ítems del pedido */}
