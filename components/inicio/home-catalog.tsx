@@ -37,13 +37,24 @@ function ProductImage({ name, imageUrl }: { name: string; imageUrl: string | nul
   imageUrl ??= fallbackImage(name);
   if (imageUrl) {
     return (
-      <Image
-        src={imageUrl}
-        alt={name}
-        fill
-        sizes="(max-width: 640px) 50vw, 200px"
-        className="object-cover"
-      />
+      <>
+        {/* Relleno difuminado: la imagen se ve completa sea cual sea su proporción */}
+        <Image
+          src={imageUrl}
+          alt=""
+          fill
+          sizes="(max-width: 640px) 50vw, 200px"
+          className="object-cover blur-2xl opacity-60 scale-110"
+          aria-hidden
+        />
+        <Image
+          src={imageUrl}
+          alt={name}
+          fill
+          sizes="(max-width: 640px) 50vw, 200px"
+          className="object-contain"
+        />
+      </>
     );
   }
   return (
@@ -164,14 +175,25 @@ export function HomeCatalog({
         <section className="px-4" aria-label="Plato destacado">
           <div className="relative aspect-[4/3.4] overflow-hidden rounded-3xl shadow-lg">
             {featured.image_url || fallbackImage(featured.name) ? (
-              <Image
-                src={featured.image_url || fallbackImage(featured.name)!}
-                alt={featured.name}
-                fill
-                priority
-                sizes="(max-width: 640px) 100vw, 420px"
-                className="object-cover"
-              />
+              <>
+                {/* Relleno difuminado + imagen completa */}
+                <Image
+                  src={featured.image_url || fallbackImage(featured.name)!}
+                  alt=""
+                  fill
+                  sizes="(max-width: 640px) 100vw, 420px"
+                  className="object-cover blur-2xl opacity-60 scale-110"
+                  aria-hidden
+                />
+                <Image
+                  src={featured.image_url || fallbackImage(featured.name)!}
+                  alt={featured.name}
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 100vw, 420px"
+                  className="object-contain"
+                />
+              </>
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-amber-600/40 to-[#141924]" />
             )}
