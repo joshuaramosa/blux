@@ -50,8 +50,11 @@ export default function RouteMap({
   destLng,
   storeLat = null,
   storeLng = null,
-  /* watchDriver=true → sigue el GPS del repartidor en vivo */
+  /* GPS del repartidor tomado del propio dispositivo (vista repartidor) */
   watchDriver = false,
+  /* …o posición del repartidor leída de la base (vista cliente) */
+  driverLat = null,
+  driverLng = null,
   heightClass = "h-64",
 }: {
   destLat: number | null;
@@ -59,20 +62,26 @@ export default function RouteMap({
   storeLat?: number | null;
   storeLng?: number | null;
   watchDriver?: boolean;
+  driverLat?: number | null;
+  driverLng?: number | null;
   heightClass?: string;
 }) {
   const dest: LatLng | null = destLat != null && destLng != null ? [destLat, destLng] : null;
   const store: LatLng | null = storeLat != null && storeLng != null ? [storeLat, storeLng] : null;
 
-  const [driver, setDriver] = useState<LatLng | null>(null);
+  const [watchedDriver, setWatchedDriver] = useState<LatLng | null>(null);
   const [route, setRoute] = useState<LatLng[]>([]);
   const routeOriginRef = useRef<LatLng | null>(null);
+
+  // driver interno (GPS propio) o driver explícito (polling desde la base)
+  const driver: LatLng | null =
+    driverLat != null && driverLng != null ? [driverLat, driverLng] : watchedDriver;
 
   // 1) GPS del repartidor en vivo (pide permiso del navegador al activarse)
   useEffect(() => {
     if (!watchDriver || !navigator.geolocation) return;
     const id = navigator.geolocation.watchPosition(
-      (pos) => setDriver([pos.coords.latitude, pos.coords.longitude]),
+      (pos) => setWatchedDriver([pos.coords.latitude, pos.coords.longitude]),
       () => {},
       { enableHighAccuracy: true, maximumAge: 5000 },
     );

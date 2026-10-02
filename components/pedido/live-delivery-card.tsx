@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LiveDeliveryMap = dynamic(() => import("./live-delivery-map"), {
+const RouteMap = dynamic(() => import("@/components/mapa/route-map"), {
   ssr: false,
   loading: () => (
     <div className="flex h-64 w-full items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">
@@ -107,7 +107,7 @@ export function LiveDeliveryCard({ token }: { token: string }) {
 
         {hasGps ? (
           <>
-            <LiveDeliveryMap
+            <RouteMap
               driverLat={tracking.driver_lat}
               driverLng={tracking.driver_lng}
               destLat={tracking.dest_lat}
