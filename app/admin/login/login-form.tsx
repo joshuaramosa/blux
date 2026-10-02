@@ -54,6 +54,18 @@ export function LoginForm() {
             />
           </div>
 
+          {/* Guardar sesión: la próxima vez entra directo sin escribir nada */}
+          <label htmlFor="remember" className="flex items-center gap-2.5 text-sm text-muted-foreground select-none">
+            <input
+              id="remember"
+              name="remember"
+              type="checkbox"
+              defaultChecked
+              className="size-4 shrink-0 accent-[#f04e1e]"
+            />
+            Guardar mi sesión en este dispositivo
+          </label>
+
           {state?.error && (
             <p role="alert" className="text-sm text-destructive text-center">
               {state.error}
