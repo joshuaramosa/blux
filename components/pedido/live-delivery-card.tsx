@@ -23,6 +23,7 @@ type Tracking = {
   driver_lng: number | null;
   driver_updated_at: string | null;
   driver_name: string | null;
+  driver_phone: string | null;
   store_lat: number | null;
   store_lng: number | null;
 };
@@ -74,13 +75,16 @@ export function LiveDeliveryCard({ token }: { token: string }) {
     };
   }, [token]);
 
-  if (!tracking || tracking.status !== "EN_CAMINO") return null;
+  // Visible desde que hay repartidor asignado; el mapa en vivo solo en EN_CAMINO
+  if (!tracking || !["ASIGNADO", "EN_CAMINO"].includes(tracking.status)) return null;
 
+  const onTheWay = tracking.status === "EN_CAMINO";
   const hasGps = tracking.driver_lat != null && tracking.driver_lng != null;
   const destName = tracking.driver_name?.split(" ")[0] ?? "Tu repartidor";
+  const driverPhone = tracking.driver_phone?.replace(/\D/g, "") || null;
 
   const eta =
-    hasGps && tracking.dest_lat != null && tracking.dest_lng != null
+    onTheWay && hasGps && tracking.dest_lat != null && tracking.dest_lng != null
       ? etaMinutes(
           distanceKm(tracking.driver_lat!, tracking.driver_lng!, tracking.dest_lat, tracking.dest_lng),
         )
@@ -91,39 +95,69 @@ export function LiveDeliveryCard({ token }: { token: string }) {
       <CardContent className="flex flex-col gap-3 p-4">
         <div className="flex items-center justify-between">
           <p className="font-semibold">
-            🛵 {destName} va en camino
+            🛵 {destName} {onTheWay ? "va en camino" : "fue asignado a tu pedido"}
             {eta != null && (
               <span className="text-blux-600"> · llega en ~{eta} min</span>
             )}
           </p>
-          <span className="flex items-center gap-1.5 text-xs text-green-600" title="Ubicación en vivo">
-            <span className="relative flex size-2" aria-hidden>
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
-              <span className="relative inline-flex size-2 rounded-full bg-green-600" />
+          {onTheWay && (
+            <span className="flex items-center gap-1.5 text-xs text-green-600" title="Ubicación en vivo">
+              <span className="relative flex size-2" aria-hidden>
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+                <span className="relative inline-flex size-2 rounded-full bg-green-600" />
+              </span>
+              EN VIVO
             </span>
-            EN VIVO
-          </span>
+          )}
         </div>
 
-        {hasGps ? (
-          <>
-            <RouteMap
-              driverLat={tracking.driver_lat}
-              driverLng={tracking.driver_lng}
-              destLat={tracking.dest_lat}
-              destLng={tracking.dest_lng}
-              storeLat={tracking.store_lat}
-              storeLng={tracking.store_lng}
-            />
-            <p className="text-xs text-muted-foreground">
-              🛵 tu pedido · 🏠 tu dirección · 🏪 local{eta == null && " · comparte tu ubicación en el checkout para estimar la llegada"}
-            </p>
-          </>
-        ) : (
-          <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
-            El motorizado ya salió 🛵 Activa su GPS y verás su ubicación aquí en vivo.
-          </p>
+        {/* Perfil del repartidor asignado */}
+        {tracking.driver_name && (
+          <div className="flex items-center justify-between gap-3 rounded-xl border bg-muted/40 p-3">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-full bg-[#f04e1e] text-base font-black text-white">
+                {tracking.driver_name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="text-sm font-bold leading-tight">{tracking.driver_name}</p>
+                <p className="text-xs text-muted-foreground">Tu repartidor</p>
+              </div>
+            </div>
+            {driverPhone && (
+              <a
+                href={`https://wa.me/51${driverPhone}?text=${encodeURIComponent(
+                  `Hola ${tracking.driver_name}, soy el cliente del pedido #${String(tracking.order_number).padStart(3, "0")}.`,
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white active:scale-95"
+              >
+                💬 Chatear
+              </a>
+            )}
+          </div>
         )}
+
+        {onTheWay &&
+          (hasGps ? (
+            <>
+              <RouteMap
+                driverLat={tracking.driver_lat}
+                driverLng={tracking.driver_lng}
+                destLat={tracking.dest_lat}
+                destLng={tracking.dest_lng}
+                storeLat={tracking.store_lat}
+                storeLng={tracking.store_lng}
+              />
+              <p className="text-xs text-muted-foreground">
+                🛵 tu pedido · 🏠 tu dirección · 🏪 local{eta == null && " · comparte tu ubicación en el checkout para estimar la llegada"}
+              </p>
+            </>
+          ) : (
+            <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
+              El motorizado ya salió 🛵 Activa su GPS y verás su ubicación aquí en vivo.
+            </p>
+          ))}
       </CardContent>
     </Card>
   );

@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { DashboardView } from "@/components/admin/dashboard-view";
 import { isOpenNow, startOfTodayLimaISO } from "@/lib/business";
+import type { Settlement } from "@/app/admin/(panel)/pedidos/actions";
+import { CashSettlementsCard } from "@/components/admin/cash-settlements-card";
 import type {
   OrderWithDetails,
   StaffUser,
@@ -86,6 +88,9 @@ export default async function AdminDashboardPage() {
 
   const repartidores: StaffUser[] = staffData || [];
 
+  // 4. Rendiciones de efectivo de repartidores
+  const { data: settlementsData } = await supabase.rpc("get_settlements");
+
   return (
     <main className="max-w-3xl mx-auto p-4 space-y-4">
       <div className="flex items-center justify-between">
@@ -97,10 +102,18 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
+      <CashSettlementsCard
+        settlements={((settlementsData as { settlements?: Settlement[] } | null)?.settlements) ?? []}
+      />
+
       <DashboardView
         ordersToday={orders}
         repartidores={repartidores}
         businessIsOpen={businessIsOpen}
+      />
+
+      <CashSettlementsCard
+        settlements={((settlementsData as { settlements?: Settlement[] } | null)?.settlements) ?? []}
       />
     </main>
   );

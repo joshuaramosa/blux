@@ -154,6 +154,37 @@ export function OrderDetailDialog({
               </div>
             </div>
 
+            {/* Repartidor asignado (visible siempre que exista, incl. entregados) */}
+            {order.delivery_assignment?.delivery_user && (
+              <div className="flex items-center gap-2.5 rounded-xl border bg-card p-3 shadow-xs text-sm">
+                <div className="flex size-9 items-center justify-center rounded-full bg-[#f04e1e] text-sm font-black text-white">
+                  {order.delivery_assignment.delivery_user.full_name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-foreground">
+                    🛵 {order.delivery_assignment.delivery_user.full_name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {order.delivery_assignment.status === "ENTREGADO" && order.delivery_assignment.delivered_at
+                      ? `Entregado ${new Date(order.delivery_assignment.delivered_at).toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit", timeZone: "America/Lima" })}`
+                      : order.delivery_assignment.status === "EN_CAMINO"
+                        ? "En camino"
+                        : "Asignado"}
+                  </p>
+                </div>
+                {order.delivery_assignment.delivery_user.phone && (
+                  <a
+                    href={`https://wa.me/51${order.delivery_assignment.delivery_user.phone.replace(/\D/g, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-bold text-emerald-600 underline"
+                  >
+                    💬 WhatsApp
+                  </a>
+                )}
+              </div>
+            )}
+
             {/* Dirección y Navegación */}
             <div className="rounded-xl bg-card border p-3 shadow-xs space-y-2">
               <div className="flex items-start gap-2">

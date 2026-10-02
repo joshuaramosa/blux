@@ -20,6 +20,40 @@ async function requireDeliveryStaff() {
   return { error: null, userId: data.user.id };
 }
 
+export type CashSummary = {
+  pending_amount: number;
+  pending_orders: { id: string; order_number: number; total: number; delivered_at: string | null }[];
+  my_settlements: { id: string; amount: number; status: string; created_at: string }[];
+};
+
+/** Mi caja: efectivo contra-entrega pendiente de rendir al admin */
+export async function getMyCashSummary(): Promise<{ data?: CashSummary; error?: string }> {
+  const auth = await requireDeliveryStaff();
+  if (auth.error) return { error: auth.error };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_my_cash_summary");
+  if (error) return { error: error.message };
+  return { data: data as CashSummary };
+}
+
+/** Rendir todo el efectivo pendiente → queda PENDIENTE hasta que el admin confirme */
+export async function createMySettlement(): Promise<
+  { success: true; amount: number } | { error: string }
+> {
+  const auth = await requireDeliveryStaff();
+  if (auth.error) return { error: auth.error };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("create_my_settlement");
+  if (error) {
+    if (error.message.includes("CAJA_VACIA")) return { error: "No tienes efectivo pendiente por rendir." };
+    return { error: error.message };
+  }
+  revalidatePath("/delivery");
+  return { success: true, amount: (data as { amount: number }).amount };
+}
+
 /** ASIGNADO → EN_CAMINO: el repartidor sale con el pedido */
 export async function startDelivery(assignmentId: string, orderId: string) {
   const auth = await requireDeliveryStaff();

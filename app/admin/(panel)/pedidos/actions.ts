@@ -32,6 +32,41 @@ export async function updateOrderStatus(orderId: string, newStatus: OrderStatus)
   return { success: true };
 }
 
+export type Settlement = {
+  id: string;
+  amount: number;
+  status: string;
+  created_at: string;
+  confirmed_at: string | null;
+  driver_name: string;
+  orders: { order_number: number; total: number }[];
+};
+
+/** Rendiciones de efectivo de los repartidores (ADMIN/ATENCION) */
+export async function getSettlements() {
+  const auth = await requireStaffRole(["ADMIN", "ATENCION"]);
+  if (auth.error) return auth;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_settlements");
+  if (error) return { error: error.message };
+  return { settlements: (data as { settlements: Settlement[] }).settlements ?? [] };
+}
+
+/** Confirmar que el repartidor entregó el efectivo */
+export async function confirmSettlement(id: string) {
+  const auth = await requireStaffRole(["ADMIN", "ATENCION"]);
+  if (auth.error) return auth;
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("confirm_settlement", { p_id: id });
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/pedidos");
+  return { success: true };
+}
+
 /**
  * Verificar o rechazar comprobante de pago Yape
  */
