@@ -35,8 +35,8 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "BLUX",
   },
+  // El favicon sale de app/icon.png (logo del negocio, convención de Next.js).
   icons: {
-    icon: "/logo.png",
     apple: "/icons/apple-touch-icon.png",
   },
 };
