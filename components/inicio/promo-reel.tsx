@@ -68,7 +68,8 @@ export function PromoReel({ promotions }: { promotions: Promotion[] }) {
   return (
     <section className="px-4" aria-label="Promociones">
       <div
-        className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-black shadow-lg select-none"
+        // Alto = 70% del original (aspect 4/5 → 8/7), un 30% menos de altura.
+        className="relative aspect-[8/7] overflow-hidden rounded-3xl bg-black shadow-lg select-none"
         onPointerDown={() => setPaused(true)}
         onPointerUp={() => setPaused(false)}
         onPointerLeave={() => setPaused(false)}
@@ -89,13 +90,23 @@ export function PromoReel({ promotions }: { promotions: Promotion[] }) {
               i === index ? "opacity-100" : "opacity-0"
             }`}
           >
+            {/* Relleno difuminado para que cualquier proporción se vea completa y elegante */}
+            <Image
+              src={p.image_url}
+              alt=""
+              fill
+              sizes="(max-width: 640px) 100vw, 420px"
+              className="object-cover blur-2xl opacity-60 scale-110"
+              draggable={false}
+              aria-hidden
+            />
             <Image
               src={p.image_url}
               alt={`Promoción ${i + 1}`}
               fill
               priority={i === 0}
               sizes="(max-width: 640px) 100vw, 420px"
-              className="object-cover"
+              className="object-contain"
               draggable={false}
             />
           </div>

@@ -128,8 +128,8 @@ export default async function TerminosPage() {
             <ul className="list-disc pl-5">
               <li>
                 <strong>En tu teléfono:</strong> tu nombre, celular y referencia se guardan solo
-                en tu dispositivo (para no volver a escribirlos). Puedes borrarlos cuando quieras
-                desde Perfil → “Borrar mis datos”.
+                en tu dispositivo (para no volver a escribirlos). Puedes modificarlos cuando
+                quieras desde Perfil → “Modificar”.
               </li>
               <li>
                 <strong>En el servidor:</strong> guardamos tu nombre, celular, dirección de entrega

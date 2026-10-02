@@ -53,9 +53,6 @@ export default function MisPedidosPage() {
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col gap-4 p-4">
       <header className="pt-2">
         <h1 className="text-xl font-bold">🧾 Mis pedidos</h1>
-        <p className="text-xs text-muted-foreground">
-          Los pedidos que hiciste desde este teléfono se guardan aquí.
-        </p>
       </header>
 
       {orders.length === 0 ? (

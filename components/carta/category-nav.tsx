@@ -45,8 +45,8 @@ export function CategoryNav({ categories }: { categories: Category[] }) {
             aria-current={active === c.slug}
             className={`font-sans whitespace-nowrap rounded-full px-4 py-2 text-xs sm:text-sm font-bold tracking-wide transition-all ${
               active === c.slug
-                ? "bg-blux-600 text-white shadow-xs"
-                : "bg-muted/70 text-muted-foreground hover:text-foreground hover:bg-muted"
+                ? "bg-[#f04e1e] text-white shadow-md shadow-[#f04e1e]/30"
+                : "bg-white text-stone-600 border border-black/5 hover:text-stone-900"
             }`}
           >
             {c.name}

@@ -2,15 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CircleUserRound, KeyRound, MapPin, Pencil, Phone, Save, ScrollText, Trash2 } from "lucide-react";
-import { TermsNote } from "@/components/cliente/terms-note";
+import { CircleUserRound, KeyRound, MapPin, Pencil, Phone, Save } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { InstallAppButton } from "@/components/cliente/install-app-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  clearProfile,
   getProfile,
   saveProfile,
   type CustomerProfile,
@@ -32,6 +30,7 @@ export default function PerfilPage() {
     if (typeof window === "undefined") return true;
     return !getProfile()?.name;
   });
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const set = (key: keyof CustomerProfile) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setProfile((p) => ({ ...p, [key]: e.target.value }));
@@ -40,6 +39,9 @@ export default function PerfilPage() {
     if (!profile.name.trim()) return toast.error("Escribe tu nombre.");
     if (!PHONE_RE.test(profile.phone)) {
       return toast.error("Ingresa un celular válido de 9 dígitos (empieza con 9).");
+    }
+    if (!acceptTerms) {
+      return toast.error("Debes aceptar los Términos y Condiciones para guardar.");
     }
     saveProfile({
       name: profile.name.trim(),
@@ -52,38 +54,40 @@ export default function PerfilPage() {
 
   const onModify = () => setEditing(true);
 
-  const onClear = () => {
-    clearProfile();
-    setProfile({ name: "", phone: "", reference: "" });
-    setEditing(true);
-    toast.success("Datos borrados de este teléfono");
-  };
-
   if (!mounted) return null;
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col gap-5 p-4 pb-8">
-      <header className="flex items-center gap-3 pt-2">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blux-600/10">
-          <CircleUserRound className="size-7 text-blux-600" aria-hidden />
+      <header className="flex items-center gap-3 rounded-2xl bg-gradient-to-b from-[#141a26] to-[#0b0e14] p-4 shadow-lg shadow-black/25">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f04e1e] shadow-md shadow-[#f04e1e]/40 ring-2 ring-white/20">
+          <CircleUserRound className="size-7 text-white" aria-hidden />
         </div>
         <div>
-          <h1 className="text-xl font-bold tracking-tight">Tu perfil</h1>
-          <p className="text-xs text-muted-foreground">
+          <h1 className="text-xl font-bold tracking-tight text-white">
+            {editing || !profile.name.trim() ? "Tu perfil" : `Hola, ${profile.name.trim()}`}
+          </h1>
+          <p className="text-xs text-stone-400">
             Sin contraseñas: tus datos viven solo en este teléfono.
           </p>
         </div>
       </header>
 
-      <section className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
+      <section className="flex flex-col gap-3 rounded-2xl border border-[#f04e1e]/15 bg-white p-4 shadow-sm shadow-[#f04e1e]/5">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="p-name">Tu nombre</Label>
-          <Input id="p-name" placeholder="Ej. Rosa Gutiérrez" value={profile.name} onChange={set("name")} disabled={!editing} />
+          <Label htmlFor="p-name" className="font-semibold text-[#141a26]">Nombre</Label>
+          <Input
+            id="p-name"
+            placeholder="Ej. Rosa Gutiérrez"
+            value={profile.name}
+            onChange={set("name")}
+            disabled={!editing}
+            className="disabled:opacity-100 disabled:bg-stone-50 disabled:text-[#141a26] disabled:border-stone-200"
+          />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="p-phone" className="flex items-center gap-1.5">
-            <Phone className="size-3.5" aria-hidden /> Celular
+          <Label htmlFor="p-phone" className="flex items-center gap-1.5 font-semibold text-[#141a26]">
+            <Phone className="size-3.5 text-[#f04e1e]" aria-hidden /> Celular
           </Label>
           <Input
             id="p-phone"
@@ -93,12 +97,13 @@ export default function PerfilPage() {
             onChange={set("phone")}
             maxLength={9}
             disabled={!editing}
+            className="disabled:opacity-100 disabled:bg-stone-50 disabled:text-[#141a26] disabled:border-stone-200"
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="p-ref" className="flex items-center gap-1.5">
-            <MapPin className="size-3.5" aria-hidden /> Referencia de entrega
+          <Label htmlFor="p-ref" className="flex items-center gap-1.5 font-semibold text-[#141a26]">
+            <MapPin className="size-3.5 text-[#f04e1e]" aria-hidden /> Referencia de entrega
           </Label>
           <Input
             id="p-ref"
@@ -106,24 +111,44 @@ export default function PerfilPage() {
             value={profile.reference}
             onChange={set("reference")}
             disabled={!editing}
+            className="disabled:opacity-100 disabled:bg-stone-50 disabled:text-[#141a26] disabled:border-stone-200"
           />
         </div>
 
+        {editing && (
+          <label
+            htmlFor="p-terms"
+            className="flex items-start gap-2.5 rounded-xl border border-[#f04e1e]/20 bg-[#fff8f5] p-3 text-xs leading-snug text-stone-600"
+          >
+            <input
+              id="p-terms"
+              type="checkbox"
+              checked={acceptTerms}
+              onChange={(e) => setAcceptTerms(e.target.checked)}
+              className="mt-0.5 size-4 shrink-0 accent-[#f04e1e]"
+            />
+            <span>
+              He leído y acepto los{" "}
+              <Link href="/terminos" className="font-bold text-[#d63f14] underline underline-offset-2">
+                Términos y Condiciones
+              </Link>{" "}
+              y el aviso de privacidad (Ley N.° 29733).
+            </span>
+          </label>
+        )}
+
         {editing ? (
-          <>
-            <Button
-              onClick={onSave}
-              className="mt-1 h-11 rounded-xl bg-blux-600 font-bold text-white hover:bg-blux-700 active:scale-95"
-            >
-              <Save className="size-4 mr-1.5" aria-hidden /> Guardar
-            </Button>
-            <TermsNote accion="Al guardar tus datos," />
-          </>
+          <Button
+            onClick={onSave}
+            className="mt-1 h-11 rounded-xl bg-[#f04e1e] font-bold text-white shadow-md shadow-[#f04e1e]/40 hover:bg-[#d9441a] active:scale-95"
+          >
+            <Save className="size-4 mr-1.5" aria-hidden /> Guardar
+          </Button>
         ) : (
           <Button
             onClick={onModify}
             variant="outline"
-            className="mt-1 h-11 rounded-xl font-bold active:scale-95"
+            className="mt-1 h-11 rounded-xl border-[#f04e1e]/40 font-bold text-[#d63f14] hover:bg-[#fff2ed] hover:text-[#c23a15] active:scale-95"
           >
             <Pencil className="size-4 mr-1.5" aria-hidden /> Modificar
           </Button>
@@ -132,25 +157,13 @@ export default function PerfilPage() {
 
       <section className="flex flex-col gap-2">
         <InstallAppButton />
-        <Button asChild variant="outline" className="w-full">
+        <Button asChild variant="outline" className="w-full border-blux-dark-800/20 text-blux-dark-800 hover:bg-blux-dark-900 hover:text-white">
           <Link href="/mis-pedidos">Ver mis pedidos anteriores</Link>
-        </Button>
-        <Button asChild variant="outline" className="w-full gap-2">
-          <Link href="/terminos">
-            <ScrollText className="size-4" aria-hidden /> Términos y Condiciones
-          </Link>
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={onClear}
-          className="text-destructive hover:text-destructive"
-        >
-          <Trash2 className="size-4 mr-1.5" aria-hidden /> Borrar mis datos de este teléfono
         </Button>
       </section>
 
       {/* Acceso discreto al panel del personal (admin, cocina, delivery) */}
-      <div className="mt-2 border-t border-border/60 pt-3 text-center">
+      <div className="mt-2 border-t border-[#f04e1e]/10 pt-3 text-center">
         <Link
           href="/admin/login"
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"

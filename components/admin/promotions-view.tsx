@@ -106,7 +106,8 @@ export function PromotionsView({ promotions }: { promotions: Promotion[] }) {
             {busy ? "Subiendo…" : "Subir imagen de promoción"}
           </span>
           <span className="text-xs text-muted-foreground">
-            El teléfono te pedirá permiso para la galería o cámara. Formato vertical recomendado.
+            Tamaño ideal: 1080 × 1350 px (vertical 4:5). Cualquier otra se ajusta completa
+            con relleno difuminado. JPG o WebP, máx. 2 MB (se comprime sola al subir).
           </span>
         </button>
       ) : (

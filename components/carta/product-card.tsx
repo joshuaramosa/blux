@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -46,15 +46,26 @@ export function ProductCard({
   return (
     <Card className="overflow-hidden border border-border/80 bg-card rounded-2xl shadow-xs transition-all duration-300 hover:border-blux-gold-500/50 hover:shadow-md flex flex-col justify-between">
       {/* Fotografía grande y atractiva del plato */}
-      <div className="relative aspect-[16/11] w-full overflow-hidden bg-muted/40">
+      <div className="relative aspect-[16/11] w-full overflow-hidden bg-black">
         {displayImage ? (
-          <Image
-            src={displayImage}
-            alt={product.name}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
-            className="object-cover transition-transform duration-500 hover:scale-105"
-          />
+          <>
+            {/* Relleno difuminado: cualquier proporción se ve completa y elegante */}
+            <Image
+              src={displayImage}
+              alt=""
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+              className="object-cover blur-2xl opacity-60 scale-110"
+              aria-hidden
+            />
+            <Image
+              src={displayImage}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+              className="object-contain transition-transform duration-500 hover:scale-105"
+            />
+          </>
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-amber-500/10 via-red-500/5 to-transparent p-3">
             <BluxLogo size="xs" priority={false} />
@@ -106,10 +117,10 @@ export function ProductCard({
             disabled={disabled}
             onClick={handleAdd}
             aria-disabled={disabled}
-            className="font-sans font-bold text-xs sm:text-sm uppercase tracking-wider h-11 px-4 sm:px-5 rounded-xl bg-blux-600 hover:bg-blux-700 active:scale-95 text-white shadow-xs transition-all"
+            className="font-sans font-extrabold text-xs sm:text-sm uppercase tracking-wider h-11 px-4 sm:px-5 rounded-xl bg-[#f04e1e] hover:bg-[#d8431a] active:scale-95 text-white shadow-sm shadow-[#f04e1e]/40 transition-all"
           >
-            <Plus className="size-4 mr-1 stroke-[3]" />
-            <span>{product.is_available ? "PEDIR AHORA" : "AGOTADO"}</span>
+            <ShoppingCart className="size-4 mr-1" aria-hidden />
+            <span>{product.is_available ? "Agregar" : "Agotado"}</span>
           </Button>
         </div>
       </CardContent>
