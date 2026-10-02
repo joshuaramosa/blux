@@ -76,11 +76,11 @@ export default async function AdminDashboardPage() {
     (ordersData ?? []) as unknown as RawOrder[],
   );
 
-  // 3. Repartidores disponibles
+  // 3. Repartidores disponibles (incluye ADMIN: también puede hacer repartos)
   const { data: staffData } = await supabase
     .from("users")
     .select("*")
-    .eq("role", "REPARTIDOR")
+    .in("role", ["REPARTIDOR", "ADMIN"])
     .eq("is_active", true)
     .order("full_name");
 
