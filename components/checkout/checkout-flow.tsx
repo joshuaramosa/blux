@@ -270,7 +270,29 @@ export function CheckoutFlow({ settings }: { settings: BusinessSettings | null }
           role="alert"
           className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive"
         >
-          {error}
+          {error.startsWith("SUSPENDIDO|") ? (
+            <>
+              <p className="font-bold">⚠️ Tu número está suspendido</p>
+              <p>
+                Por una cancelación con gastos pendientes. Para reactivarlo debes pagar{" "}
+                <strong>{formatSoles(Number(error.split("|")[1] ?? 0))}</strong> (tu pedido
+                cancelado + S/5 de reactivación).
+              </p>
+              {settings?.whatsapp && (
+                <Button asChild size="sm" className="mt-2 bg-emerald-600 font-bold text-white hover:bg-emerald-700">
+                  <a
+                    href={`https://wa.me/${settings.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Hola, mi número está suspendido y quiero reactivarlo pagando mi gasto pendiente.")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    💬 Contactar a soporte por WhatsApp
+                  </a>
+                </Button>
+              )}
+            </>
+          ) : (
+            error
+          )}
         </div>
       )}
 

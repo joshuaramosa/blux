@@ -56,6 +56,10 @@ export type Customer = {
   id: string;
   full_name: string;
   phone: string;
+  is_blocked: boolean;
+  blocked_at: string | null;
+  blocked_reason: string | null;
+  blocked_debt: number;
   created_at: string;
 };
 

@@ -30,6 +30,10 @@ function mapRpcError(message: string): string {
     const [, detail] = message.split("PRODUCTO_NO_DISPONIBLE:");
     return `"${detail ?? "Un producto"}" ya no está disponible.`;
   }
+  if (message.includes("CLIENTE_BLOQUEADO")) {
+    const [, debt] = message.split("CLIENTE_BLOQUEADO:");
+    return `SUSPENDIDO|${debt ?? "0"}`;
+  }
   return "⚠️ No pudimos completar el pedido. Comprueba tu conexión e inténtalo nuevamente.";
 }
 

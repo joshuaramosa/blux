@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Volume2, VolumeX } from "lucide-react";
@@ -19,7 +19,13 @@ const soundIsOn = () =>
  */
 export function AdminRealtime() {
   const router = useRouter();
-  const [soundOn, setSoundOn] = useState(soundIsOn);
+  // Valor inicial fijo (= servidor). localStorage se lee tras montar
+  // para evitar el error de hidratación (server=false vs client=true).
+  const [soundOn, setSoundOn] = useState(true);
+
+  useEffect(() => {
+    setSoundOn(soundIsOn());
+  }, []);
 
   const onPayload = useCallback(
     (_sub: unknown, payload: RealtimeEventPayload) => {

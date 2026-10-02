@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useMounted } from "@/hooks/use-mounted";
-import { getSavedOrders, type SavedOrder } from "@/lib/order-memory";
+import { getSavedOrders, removeSavedOrder, type SavedOrder } from "@/lib/order-memory";
 import { getOrderSummaries, type OrderSummary } from "./actions";
 import { formatSoles } from "@/lib/business";
 
@@ -17,6 +17,12 @@ const STATUS_LABEL: Record<string, string> = {
   EN_CAMINO: "🛵 En camino",
   ENTREGADO: "🎉 Entregado",
   CANCELADO: "⛔ Cancelado",
+};
+
+// Colores por estado: entregado en verde, cancelado en rojo, resto neutro.
+const STATUS_STYLE: Record<string, string> = {
+  ENTREGADO: "bg-green-100 text-green-700",
+  CANCELADO: "bg-red-100 text-red-600",
 };
 
 export default function MisPedidosPage() {
@@ -36,7 +42,14 @@ export default function MisPedidosPage() {
       const summaries = await getOrderSummaries(saved.map((o) => o.token));
       if (!alive) return;
       const byToken = new Map(summaries.map((s) => [s.token, s]));
-      setOrders(saved.map((o) => ({ ...o, summary: byToken.get(o.token) })));
+      // Depura pedidos que ya no existen en el servidor (p. ej. borrados de la BD):
+      // se quitan del teléfono para no mostrar enlaces rotos (404).
+      const valid = saved.filter((o) => {
+        if (byToken.has(o.token)) return true;
+        removeSavedOrder(o.token);
+        return false;
+      });
+      setOrders(valid.map((o) => ({ ...o, summary: byToken.get(o.token) })));
     };
 
     queueMicrotask(load); // primera carga
@@ -87,7 +100,13 @@ export default function MisPedidosPage() {
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  <span className="text-sm font-medium">
+                  <span
+                    className={`text-xs font-bold rounded-full px-2.5 py-1 ${
+                      o.summary
+                        ? STATUS_STYLE[o.summary.status] ?? "bg-muted text-muted-foreground"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
                     {o.summary ? STATUS_LABEL[o.summary.status] ?? o.summary.status : "…"}
                   </span>
                   <span className="text-sm font-bold text-blux-600">

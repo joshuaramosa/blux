@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { OrderStatusBadge } from "@/components/admin/order-status-badge";
+import { unblockCustomer } from "@/app/admin/(panel)/clientes/actions";
 import { formatSoles } from "@/lib/business";
 import type { Customer, OrderWithDetails } from "@/types";
 import {
@@ -13,6 +16,8 @@ import {
   ChevronDown,
   ChevronUp,
   User,
+  Lock,
+  LockOpen,
 } from "lucide-react";
 
 interface CustomerWithOrders extends Customer {
@@ -24,8 +29,21 @@ interface CustomersViewProps {
 }
 
 export function CustomersView({ customers }: CustomersViewProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedCustomerId, setExpandedCustomerId] = useState<string | null>(null);
+  const [unblocking, setUnblocking] = useState<string | null>(null);
+
+  const handleUnblock = async (customer: CustomerWithOrders) => {
+    setUnblocking(customer.id);
+    const res = await unblockCustomer(customer.id);
+    setUnblocking(null);
+    if (res.error) toast.error(res.error);
+    else {
+      toast.success(`${customer.full_name} reactivado`);
+      router.refresh();
+    }
+  };
 
   const filteredCustomers = useMemo(() => {
     if (!searchTerm.trim()) return customers;
@@ -87,6 +105,12 @@ export function CustomersView({ customers }: CustomersViewProps) {
                       <Phone className="h-3 w-3" />
                       {customer.phone}
                     </p>
+                    {customer.is_blocked && (
+                      <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-600">
+                        <Lock className="h-3 w-3" />
+                        Suspendido — debe {formatSoles(Number(customer.blocked_debt || 0))}
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex gap-1.5">
@@ -112,8 +136,28 @@ export function CustomersView({ customers }: CustomersViewProps) {
                         WhatsApp
                       </a>
                     </Button>
+                    {customer.is_blocked && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleUnblock(customer)}
+                        disabled={unblocking === customer.id}
+                        className="h-8 px-2.5 text-xs gap-1 text-red-600 border-red-200 hover:bg-red-50"
+                        title={customer.blocked_reason ?? "Reactivar número suspendido"}
+                      >
+                        <LockOpen className="h-3 w-3" />
+                        {unblocking === customer.id ? "…" : "Reactivar"}
+                      </Button>
+                    )}
                   </div>
                 </div>
+
+                {customer.is_blocked && customer.blocked_reason && (
+                  <p className="mt-2 rounded-lg bg-red-50 px-2.5 py-1.5 text-[11px] text-red-700">
+                    ⛔ {customer.blocked_reason}. Reactivar solo cuando pague los{" "}
+                    <strong>{formatSoles(Number(customer.blocked_debt || 0))}</strong> por WhatsApp.
+                  </p>
+                )}
 
                 {/* Resumen de actividad */}
                 <div className="mt-3 pt-2.5 border-t flex items-center justify-between text-xs">

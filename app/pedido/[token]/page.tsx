@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { OrderTracker } from "@/components/pedido/order-tracker";
 import { LiveDeliveryCard } from "@/components/pedido/live-delivery-card";
+import { CancelOrderButton } from "@/components/pedido/cancel-order-button";
 import type { OrderStatus } from "@/types";
 
 export const metadata = { title: "Estado de tu pedido — BLUX" };
@@ -68,6 +69,12 @@ export default async function PedidoPage({ params }: { params: Promise<{ token: 
       <p className="text-center text-xs text-muted-foreground">
         Guarda este enlace para seguir tu pedido en vivo: blux.pe/pedido/{token}
       </p>
+
+      <CancelOrderButton
+        token={token}
+        status={order.status as OrderStatus}
+        orderNumber={order.order_number}
+      />
 
       <Button asChild variant="outline">
         <Link href="/carta">Volver a la carta</Link>
